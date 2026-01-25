@@ -7,8 +7,17 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 
 const app = express();
-app.use(cors());
+
+// Enable CORS for all routes (important for Vercel)
+app.use(cors({
+  origin: ['https://bazar-online-swart.vercel.app', 'http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(express.json({ limit: '10mb' }));
+
+// Serve static files (HTML, CSS, JS) from root directory
+app.use(express.static(__dirname));
 
 // Simple JWT secret (in production, use env var)
 const JWT_SECRET = process.env.JWT_SECRET || 'cambiar_esto_por_una_secreta_en_prod';
@@ -17,6 +26,7 @@ const DATA_DIR = path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'catalog.json');
 const IMAGES_DIR = path.join(DATA_DIR, 'images');
 
+// Ensure data directories exist
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
 if (!fs.existsSync(IMAGES_DIR)) fs.mkdirSync(IMAGES_DIR, { recursive: true });
@@ -212,6 +222,11 @@ app.post('/auth/change-password', authenticate, (req, res) => {
   } catch (e) {
     res.status(500).json({ error: 'Could not save password' });
   }
+});
+
+// Route to serve index.html at root
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 const PORT = process.env.PORT || 3000;

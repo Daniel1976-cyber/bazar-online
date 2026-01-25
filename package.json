@@ -1,11 +1,12 @@
 {
-  "name": "romero-backend",
+  "name": "bazar-online",
   "version": "1.0.0",
-  "description": "Backend simple para catálogo de productos (JSON file)",
+  "description": "Bazar El Romero - Tienda online de ropa, hogar, plantas y más",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "echo 'Build completed successfully'"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -16,5 +17,8 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
