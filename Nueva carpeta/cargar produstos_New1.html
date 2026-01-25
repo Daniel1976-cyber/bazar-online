@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Administración - Cargar Productos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --verde: #3a6b4a;
+      --crema: #f5f1e8;
+      --tierra: #8c5e46;
+      --hoja: #5a8a3a;
+      --texto: #2e2e2e;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 1.5rem;
+      background: var(--crema);
+      color: var(--texto);
+    }
+    h2 {
+      color: var(--verde);
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+    h3 {
+      color: var(--verde);
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.7rem;
+      margin: 0.5rem 0;
+      border-radius: 6px;
+      border: 1px solid var(--tierra);
+      font-size: 1rem;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    button {
+      background-color: var(--verde);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: var(--hoja);
+    }
+    button.inline {
+      background: transparent;
+      border: 1px solid var(--hoja);
+      color: var(--verde);
+      padding: 0.3rem 0.6rem;
+      font-size: 0.85rem;
+      width: auto;
+      margin: 0 0.2rem;
+    }
+    button.inline:hover {
+      background: var(--verde);
+      color: white;
+    }
+    .buttons-row {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+    .buttons-row button {
+      flex: 1;
+      min-width: 120px;
+    }
+    .small {
+      font-size: 0.8rem;
+      color: var(--tierra);
+      margin-top: -0.4rem;
+      margin-bottom: 0.8rem;
+    }
+    img.mini {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+      margin: 0.5rem 0;
+    }
+    .auth-section {
+      border: 2px solid var(--verde);
+      padding: 1.2rem;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.8);
+      margin-bottom: 1.5rem;
+    }
+    .auth-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .auth-header h3 {
+      margin: 0;
+      color: var(--verde);
+      font-size: 1.1rem;
+    }
+    .auth-status {
+      margin-left: auto;
+      font-weight: bold;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      background: #fff3cd;
+      color: #856404;
+    }
+    .auth-status.authenticated {
+      background: #d4edda;
+      color: #155724;
+    }
+    .admin-panel {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      max-width: 1000px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .admin-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .admin-buttons button {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.8rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: var(--verde);
+      color: white;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background: rgba(58, 107, 74, 0.02);
+    }
+    tr:hover {
+      background: rgba(58, 107, 74, 0.08);
+    }
+    .form-container {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .form-row input, .form-row select {
+      flex: 1;
+      margin: 0;
+    }
+    .product-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+    .product-item {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: white;
+    }
+    .product-info {
+      flex: 1;
+    }
+    .product-info strong {
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+    .product-info small {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h2>Administración de Productos - Bazar El Romero</h2>
+
+  <!-- SECCIÓN DE AUTENTICACIÓN -->
+  <div class="auth-section" id="authSection">
+    <div class="auth-header">
+      <h3>Área de Administración</h3>
+      <div class="auth-status" id="authStatus">No autenticado</div>
+    </div>
+
+    <div id="loginForm">
+      <label for="username" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Usuario</label>
+      <input id="username" placeholder="Ingresa tu usuario" autofocus />
+
+      <label for="password" style="display: block; margin-top: 0.8rem; margin-bottom: 0.5rem; font-weight: 600;">Contraseña</label>
+      <input id="password" type="password" placeholder="Ingresa tu contraseña" />
+
+      <div style="margin-top: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <input id="showPass" type="checkbox" onchange="document.getElementById('password').type = this.checked ? 'text' : 'password'" />
+        <label for="showPass" style="margin: 0; font-size: 0.9rem;">Mostrar contraseña</label>
+      </div>
+
+      <div style="margin-top:0.25rem; margin-bottom:0.8rem; display:flex; align-items:center; gap:0.5rem;">
+        <input id="rememberMe" type="checkbox" />
+        <label for="rememberMe" style="margin:0; font-size:0.95rem">Recordarme en este equipo</label>
+      </div>
+
+      <button onclick="login()">Iniciar Sesión</button>
+      <div class="small" style="text-align: center; margin-top: 0.8rem;">Credenciales por defecto: <strong>admin / admin123</strong></div>
+    </div>
+
+    <div id="logoutForm" style="display: none;">
+      <div style="text-align: center; margin-bottom: 1rem;">
+        <p style="font-weight: bold; color: var(--verde); margin-bottom: 0.5rem;">Sesión iniciada correctamente</p>
+      </div>
+      <button onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </div>
+
+  <!-- PANEL DE ADMINISTRACIÓN (Solo visible si está autenticado) -->
+  <div id="adminPanel" style="display: none;">
+    <div class="admin-panel">
+      <h2>Panel de Administración</h2>
+      <div class="admin-buttons">
+        <button onclick="mostrarForm('add')">➕ Añadir Producto</button>
+        <button onclick="mostrarCambioPass()">🔑 Cambiar Contraseña</button>
+        <button onclick="document.getElementById('excelFile').click()">📥 Importar Excel</button>
+        <button onclick="exportarCatalogo('excel')">📊 Exportar a Excel</button>
+        <button onclick="exportarCatalogo('json')">💾 Exportar a JSON</button>
+      </div>
+
+      <!-- Formulario de Producto -->
+      <div id="formDiv" style="display: none;" class="form-container">
+        <h3 id="formTitle">Añadir Nuevo Producto</h3>
+        <div class="form-row">
+          <input id="fNombre" placeholder="Nombre del producto" />
+          <input id="fPrecio" type="number" placeholder="Precio CUP" min="0" step="0.01" />
+        </div>
+        <div class="form-row">
+          <select id="fCat">
+            <option value="Ropa de Mujer">Ropa de Mujer</option>
+            <option value="Ropa de Hombre">Ropa de Hombre</option>
+            <option value="Ropa de Niña">Ropa de Niña</option>
+            <option value="Cerámica">Cerámica</option>
+            <option value="Muñequería">Muñequería</option>
+            <option value="Plásticos para el Hogar">Plásticos para el Hogar</option>
+            <option value="Plantas Aromáticas y Medicinales">Plantas Aromáticas y Medicinales</option>
+            <option value="Plomería PVC">Plomería PVC</option>
+          </select>
+          <select id="fDisp">
+            <option value="true">Disponible</option>
+            <option value="false">Agotado</option>
+          </select>
+        </div>
+        <input id="fFile" type="file" accept="image/*" />
+        <div class="small">⬆️ Sube una imagen desde tu PC</div>
+        <input id="fUrl" placeholder="O pega aquí el link de una imagen" />
+        <img id="fImg" class="mini" />
+        <div class="buttons-row">
+          <button onclick="guardar()" id="guardarBtn">Guardar Producto</button>
+          <button onclick="mostrarForm(null)" style="background-color: #ccc;">Cancelar</button>
+        </div>
+        <input id="fId" type="hidden" />
+      </div>
+
+      <!-- Formulario de Cambio de Contraseña -->
+      <div id="passDiv" style="display: none;" class="form-container">
+        <h3>Cambiar Contraseña</h3>
+        <input id="passActual" type="password" placeholder="Contraseña actual" />
+        <input id="passNueva1" type="password" placeholder="Nueva contraseña" />
+        <input id="passNueva2" type="password" placeholder="Repite la nueva contraseña" />
+        <div class="buttons-row">
+          <button onclick="changePassword()">Actualizar Contraseña</button>
+          <button onclick="mostrarCambioPass()" style="background-color: #ccc;">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Tabla de Productos -->
+      <h3 style="margin-top: 2rem;">Productos en el Catálogo</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Precio (CUP)</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="listaProd"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- LISTADO DE PRODUCTOS (Vista pública, siempre visible) -->
+  <h3 id="productosTitle" style="margin-top: 2rem; display: none;">Productos Cargados</h3>
+  <div id="productList" class="product-list"></div>
+
+  <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;" />
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    let catalogo = [];
+    let editando = false;
+    // Si se desea mantener sesión entre recargas, poner true.
+    // Por seguridad y para forzar el login manual, dejamos false por defecto.
+    const PERSIST_SESSION = false;
+
+    // ===== TOKEN HELPERS =====
+    function getToken() {
+      // Prefer session token (ephemeral) over persistent local token
+      const s = sessionStorage.getItem('romeroToken');
+      if (s) {
+        try { console.debug('[TOKEN] getToken -> sessionStorage (len=' + s.length + ')'); } catch (e) {}
+        return s;
+      }
+      const l = localStorage.getItem('romeroToken');
+      try { console.debug('[TOKEN] getToken -> localStorage (len=' + (l ? l.length : 0) + ')'); } catch (e) {}
+      return l;
+    }
+
+    function setToken(t, persist = false) {
+      // persist=true -> localStorage (remember me)
+      // persist=false -> sessionStorage (only for this tab/session)
+      if (t) {
+        try { console.debug('[TOKEN] setToken -> storing token (persist=' + !!persist + ', len=' + t.length + ')'); } catch (e) {}
+        if (persist) {
+          localStorage.setItem('romeroToken', t);
+        } else {
+          sessionStorage.setItem('romeroToken', t);
+        }
+      } else {
+        // clear both
+        try { console.debug('[TOKEN] setToken -> clearing token from storage'); } catch (e) {}
+        try { localStorage.removeItem('romeroToken'); } catch (e) {}
+        try { sessionStorage.removeItem('romeroToken'); } catch (e) {}
+      }
+    }
+
+    // ===== UI UPDATES =====
+    function updateAuthUI() {
+      const token = getToken();
+      const isAuth = !!token;
+      document.getElementById('authStatus').textContent = isAuth ? 'Autenticado ✓' : 'No autenticado';
+      document.getElementById('authStatus').classList.toggle('authenticated', isAuth);
+      document.getElementById('loginForm').style.display = isAuth ? 'none' : 'block';
+      document.getElementById('logoutForm').style.display = isAuth ? 'block' : 'none';
+      document.getElementById('adminPanel').style.display = isAuth ? 'block' : 'none';
+      document.getElementById('productosTitle').style.display = isAuth ? 'block' : 'none';
+    }
+
+    // ===== AUTENTICACIÓN =====
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!username || !password) {
+        alert('Por favor ingresa usuario y contraseña');
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (!res.ok) throw new Error('Credenciales inválidas');
+
+        const data = await res.json();
+        const remember = !!document.getElementById('rememberMe') && document.getElementById('rememberMe').checked;
+        setToken(data.token, remember);
+        updateAuthUI();
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        await fetchProducts();
+      } catch (e) {
+        alert('Error al autenticar: ' + e.message);
+      }
+    }
+
+    function logout() {
+      if (confirm('¿Deseas cerrar la sesión?')) {
+        // clear both session and local tokens
+        setToken(null);
+        updateAuthUI();
+        alert('Sesión cerrada');
+      }
+    }
+
+    // ===== CAMBIO DE CONTRASEÑA =====
+    function mostrarCambioPass() {
+      const div = document.getElementById('passDiv');
+      div.style.display = div.style.display === 'none' ? 'block' : 'none';
+      if (div.style.display === 'block') {
+        document.getElementById('passActual').focus();
+      }
+    }
+
+    async function changePassword() {
+      const oldPassword = document.getElementById('passActual').value;
+      const newPassword1 = document.getElementById('passNueva1').value;
+      const newPassword2 = document.getElementById('passNueva2').value;
+
+      if (!oldPassword || !newPassword1 || !newPassword2) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
+
+      if (newPassword1 !== newPassword2) {
+        alert('Las nuevas contraseñas no coinciden');
+        return;
+      }
+
+      if (newPassword1.length < 6) {
+        alert('La nueva contraseña debe tener al menos 6 caracteres');
+        return;
+      }
+
+      const token = getToken();
+      if (!token) return alert('Debes iniciar sesión');
+
+      try {
+        const res = await fetch(API_BASE + '/auth/change-password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ oldPassword, newPassword: newPassword1 })
+        });
+
+        if (!res.ok) {
+          const error = await res.text();
+          throw new Error(error || 'Error al cambiar contraseña');
+        }
+
+        alert('✓ Contraseña cambiada correctamente');
+        document.getElementById('passActual').value = '';
+        document.getElementById('passNueva1').value = '';
+        document.getElementById('passNueva2').value = '';
+        mostrarCambioPass();
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    // ===== CARGAR PRODUCTOS =====
+    async function fetchProducts() {
+      try {
+        const token = getToken();
+        const url = token ? (API_BASE + '/products?all=true') : (API_BASE + '/products');
+        const opts = token ? { headers: { 'Authorization': 'Bearer ' + token } } : {};
+        const res = await fetch(url, opts);
+        if (!res.ok) throw new Error('No se pudo obtener productos');
+        catalogo = await res.json();
+        mostrarTabla();
+        renderProducts();
+      } catch (e) {
+        console.error(e);
+        alert('Error al cargar productos: ' + e.message);
+      }
+    }
+
+    // ===== FORMULARIO DE PRODUCTO =====
+    function mostrarForm(action, id = null) {
+      const div = document.getElementById('formDiv');
+      const title = document.getElementById('formTitle');
+
+      if (!action) {
+        div.style.display = 'none';
+        clearForm();
+        return;
+      }
+
+      if (action === 'add') {
+        editando = false;
+        title.textContent = 'Añadir Nuevo Producto';
+        clearForm();
+      } else if (action === 'edit' && id) {
+        editando = true;
+        title.textContent = 'Editar Producto';
+        const p = catalogo.find(x => x.id === id);
+        if (!p) return alert('Producto no encontrado');
+
+        document.getElementById('fId').value = p.id;
+        document.getElementById('fNombre').value = p.nombre;
+        document.getElementById('fPrecio').value = p.precio;
+        document.getElementById('fCat').value = p.categoria;
+        document.getElementById('fDisp').value = p.disponible ? 'true' : 'false';
+
+        const imgSrc = p.img && p.img.startsWith('/') ? (API_BASE + p.img) : p.img;
+        document.getElementById('fImg').src = imgSrc;
+        document.getElementById('fUrl').value = p.img;
+      }
+
+      div.style.display = 'block';
+      document.getElementById('passDiv').style.display = 'none';
+      document.getElementById('fNombre').focus();
+    }
+
+    function clearForm() {
+      ['fId', 'fNombre', 'fPrecio', 'fUrl', 'fFile'].forEach(id => (document.getElementById(id).value = ''));
+      document.getElementById('fImg').src = '';
+      document.getElementById('fCat').value = 'Ropa de Mujer';
+      document.getElementById('fDisp').value = 'true';
+    }
+
+    // Preview image
+    document.getElementById('fFile').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('fImg').src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('fUrl').addEventListener('input', function () {
+      const url = this.value.trim();
+      if (url) document.getElementById('fImg').src = url;
+    });
+
+    // ===== GUARDAR PRODUCTO =====
+    async function guardar() {
+      const id = editando ? Number(document.getElementById('fId').value) : undefined;
+      const nombre = document.getElementById('fNombre').value.trim();
+      const precio = Number(document.getElementById('fPrecio').value);
+      const categoria = document.getElementById('fCat').value;
+      const disponible = document.getElementById('fDisp').value === 'true';
+      let img = '';
+
+      if (!nombre || !precio) {
+        alert('El nombre y precio son obligatorios');
+        return;
+      }
+
+      const urlInput = document.getElementById('fUrl').value.trim();
+      const fileInput = document.getElementById('fFile').files[0];
+
+      try {
+        if (urlInput) {
+          img = urlInput;
+        } else if (fileInput) {
+          img = await uploadImage(fileInput);
+        } else {
+          img = 'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
+        }
+
+        await saveProduct(id, nombre, precio, categoria, disponible, img);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    async function uploadImage(file) {
+      const token = getToken();
+      if (!token) throw new Error('Debes iniciar sesión para subir imágenes');
+
+      const fd = new FormData();
+      fd.append('image', file);
+
+      const res = await fetch(API_BASE + '/upload-image', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: fd
+      });
+
+      if (!res.ok) throw new Error('Error subiendo imagen');
+      const data = await res.json();
+      return API_BASE + data.url;
+    }
+
+    async function saveProduct(id, nombre, precio, categoria, disponible, img) {
+      const token = getToken();
+      if (!token) return alert('Debes iniciar sesión');
+
+      const payload = { nombre, precio, categoria, disponible, img };
+      if (id !== undefined) payload.id = id;
+
+      try {
+        const url = id ? (API_BASE + '/products/' + id) : (API_BASE + '/products');
+        const method = id ? 'PUT' : 'POST';
+
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        alert('✓ Producto guardado correctamente');
+        mostrarForm(null);
+        await fetchProducts();
+      } catch (e) {
+        alert('Error guardando: ' + e.message);
+      }
+    }
+
+    // ===== ELIMINAR PRODUCTO =====
+    async function deleteProduct(id) {
+      if (!confirm('¿Eliminar este producto?')) return;
+
+      const token = getToken();
+      if (!token) return alert('Debes iniciar sesión');
+
+      try {
+        const res = await fetch(API_BASE + '/products/' + id, {
+          method: 'DELETE',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!res.ok) throw new Error('Error al borrar');
+        alert('✓ Producto eliminado');
+        await fetchProducts();
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    // ===== MOSTRAR TABLA DE PRODUCTOS =====
+    function mostrarTabla() {
+      const tbody = document.getElementById('listaProd');
+      tbody.innerHTML = '';
+
+      if (!catalogo || !catalogo.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #999;">No hay productos cargados</td></tr>';
+        return;
+      }
+
+      catalogo.forEach(p => {
+        const tr = document.createElement('tr');
+        const imgSrc = p.img && p.img.startsWith('/') ? (API_BASE + p.img) : p.img;
+        tr.innerHTML = `
+          <td><img class="mini" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/60'"></td>
+          <td><strong>${p.nombre}</strong></td>
+          <td>${Number(p.precio).toFixed(2)} CUP</td>
+          <td>${p.categoria}</td>
+          <td>${p.disponible ? '✓ Disponible' : '✗ Agotado'}${p.active === false ? ' (Inactivo)' : ''}</td>
+          <td>
+            <button class="inline" onclick="mostrarForm('edit', ${p.id})">✏️ Editar</button>
+            <button class="inline" style="border-color: #ef4444; color: #ef4444;" onclick="deleteProduct(${p.id})">🗑️ Borrar</button>
+            <button class="inline" onclick="toggleActive(${p.id}, ${p.active === false ? 'true' : 'false'})">${p.active === false ? '🔓 Activar' : '🔒 Desactivar'}</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function toggleActive(id, newState) {
+      const token = getToken();
+      if (!token) return alert('Debes iniciar sesión para cambiar estado');
+      try {
+        const res = await fetch(API_BASE + '/products/' + id, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ active: newState })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        alert('Estado actualizado');
+        await fetchProducts();
+      } catch (e) {
+        alert('Error cambiando estado: ' + e.message);
+      }
+    }
+
+    // ===== RENDER PRODUCTOS (Lista pública) =====
+    function renderProducts() {
+      const container = document.getElementById('productList');
+      container.innerHTML = '';
+
+      if (!catalogo || !catalogo.length) {
+        container.innerHTML = '<p style="color: #999; text-align: center;">No hay productos disponibles</p>';
+        return;
+      }
+
+      catalogo.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'product-item';
+
+        const imgSrc = p.img && p.img.startsWith('/') ? (API_BASE + p.img) : p.img;
+        const img = document.createElement('img');
+        img.className = 'mini';
+        img.src = imgSrc;
+        img.onerror = () => (img.src = 'https://via.placeholder.com/60');
+
+        const info = document.createElement('div');
+        info.className = 'product-info';
+        info.innerHTML = `
+          <strong>${p.nombre}</strong>
+          <small>${p.categoria} — ${p.precio} CUP — ${p.disponible ? '✓ Disponible' : '✗ Agotado'}</small>
+        `;
+
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.gap = '0.5rem';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'inline';
+        editBtn.textContent = '✏️ Editar';
+        editBtn.onclick = () => mostrarForm('edit', p.id);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'inline';
+        delBtn.style.borderColor = '#ef4444';
+        delBtn.style.color = '#ef4444';
+        delBtn.textContent = '🗑️ Borrar';
+        delBtn.onclick = () => deleteProduct(p.id);
+
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+
+        div.appendChild(img);
+        div.appendChild(info);
+        div.appendChild(actions);
+        container.appendChild(div);
+      });
+    }
+
+    // ===== IMPORTAR EXCEL =====
+    async function cargarExcel() {
+      const input = document.getElementById('excelFile');
+      if (!input.files.length) return alert('Selecciona un archivo Excel');
+
+      const file = input.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async function (e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+          if (rows.length < 2) return alert('El archivo debe tener encabezado + al menos 1 producto');
+
+          const products = [];
+          for (let i = 1; i < rows.length; i++) {
+            const [categoria, nombre, precio] = rows[i];
+            if (!nombre || !precio) continue;
+
+            const id = Date.now() + i;
+            const cat = categoria ? String(categoria).trim() : 'Ropa de Mujer';
+            const nm = String(nombre).trim();
+            const pr = parseFloat(precio) || 0;
+            const disponible = true;
+            const img = 'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
+
+            products.push({ id, nombre: nm, precio: pr, categoria: cat, disponible, img });
+          }
+
+          if (products.length === 0) return alert('No se encontraron productos válidos en el archivo');
+
+          const token = getToken();
+          if (!token) return alert('Debes iniciar sesión para importar productos');
+
+          const res = await fetch(API_BASE + '/import', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(products)
+          });
+
+          if (!res.ok) throw new Error(await res.text());
+          const result = await res.json();
+
+          alert(`✓ Importación completada: ${result.count} productos cargados`);
+          input.value = '';
+          await fetchProducts();
+        } catch (e) {
+          alert('Error al importar: ' + e.message);
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ===== EXPORTAR CATÁLOGO =====
+    function exportarCatalogo(formato = 'excel') {
+      if (!catalogo || catalogo.length === 0) {
+        alert('No hay productos para exportar');
+        return;
+      }
+
+      if (formato === 'json') {
+        const blob = new Blob([JSON.stringify(catalogo, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'catalogo_bazar.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      } else if (formato === 'excel') {
+        const datos = [['Categoría', 'Nombre', 'Precio (CUP)', 'Disponible']];
+        catalogo.forEach(p => {
+          datos.push([p.categoria, p.nombre, p.precio, p.disponible ? 'Sí' : 'No']);
+        });
+
+        const hoja = XLSX.utils.aoa_to_sheet(datos);
+        hoja['!cols'] = [{ wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 12 }];
+        const libro = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(libro, hoja, 'Productos');
+        XLSX.writeFile(libro, 'catalogo_bazar.xlsx');
+      }
+
+      alert('✓ Catálogo exportado correctamente');
+    }
+
+    // ===== INICIALIZACIÓN =====
+    // Actualizar UI según si existe token o no.
+    // NO borrar token aquí: dejar que persista en sessionStorage hasta que el usuario logout explícitamente.
+    updateAuthUI();
+    // Cargar productos automáticamente si hay token (sin importar PERSIST_SESSION).
+    if (getToken()) fetchProducts();
+  </script>
+</body>
+</html>
