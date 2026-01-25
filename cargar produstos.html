@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Administración - Cargar Productos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 1.5rem;
+      background: #f5f1e8;
+      color: #2e2e2e;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      color: #3a6b4a;
+      margin-bottom: 1rem;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.5rem 0;
+      border-radius: 6px;
+      border: 1px solid #8c5e46;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #3a6b4a;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background-color: #5a8a3a;
+    }
+    .buttons-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .buttons-row button {
+      flex: 1;
+    }
+    .small {
+      font-size: 0.8rem;
+      color: #8c5e46;
+      margin-top: -0.4rem;
+      margin-bottom: 1rem;
+    }
+    img.mini {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 4px;
+      display: block;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>Cargar o Editar Productos</h2>
+
+  <input type="file" id="excelFile" accept=".xlsx,.xls" />
+  <button onclick="cargarExcel()">Cargar productos desde Excel</button>
+
+  <form id="productoForm" style="margin-top:1.5rem;">
+    <input id="fId" type="hidden" />
+    <input id="fNombre" placeholder="Nombre" required />
+    <input id="fPrecio" type="number" placeholder="Precio CUP" required min="0" step="0.01" />
+    <select id="fCat" required>
+      <option value="Ropa de Mujer">Ropa de Mujer</option>
+      <option value="Ropa de Hombre">Ropa de Hombre</option>
+      <option value="Ropa de Niña">Ropa de Niña</option>
+      <option value="Cerámica">Cerámica</option>
+      <option value="Muñequería">Muñequería</option>
+      <option value="Plásticos para el Hogar">Plásticos para el Hogar</option>
+      <option value="Plantas Aromáticas y Medicinales">Plantas Aromáticas y Medicinales</option>
+    </select>
+    <select id="fDisp" required>
+      <option value="true">Disponible</option>
+      <option value="false">Agotado</option>
+    </select>
+    <input id="fFile" type="file" accept="image/*" />
+    <div class="small">⬆️ O bien sube un archivo desde tu PC</div>
+    <input id="fUrl" placeholder="https://tu-imagen.jpg" />
+    <div class="small">⬆️ O pega aquí el link de tu imagen ya subida a internet</div>
+    <img id="fImg" class="mini" />
+    <div class="buttons-row">
+      <button type="button" onclick="guardar()">Guardar Producto</button>
+      <button type="button" onclick="location.href='admin.html'">Volver al Panel</button>
+      <button type="button" onclick="location.href='index.html'">Salir de Administración</button>
+    </div>
+  </form>
+
+  <script>
+    let catalogo = JSON.parse(localStorage.getItem('romeroCatalogo') || '[]');
+    let editando = false;
+
+    // Actualizar imagen al seleccionar archivo
+    document.getElementById('fFile').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        document.getElementById('fImg').src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Actualizar imagen desde url
+    document.getElementById('fUrl').addEventListener('input', function () {
+      const url = this.value.trim();
+      if (url) document.getElementById('fImg').src = url;
+    });
+
+    function cargarExcel() {
+      const input = document.getElementById('excelFile');
+      if (!input.files.length) return alert('Selecciona un archivo Excel');
+
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        if (rows.length < 2) return alert('El archivo debe tener al menos 1 producto');
+
+        catalogo = [];
+
+        for (let i = 1; i < rows.length; i++) {
+          const [categoria, nombre, precio] = rows[i];
+          if (!nombre || !precio) continue;
+          const id = Date.now() + i;
+          const cat = categoria ? categoria.toString().trim() : 'Ropa de Mujer';
+          const nm = nombre.toString().trim();
+          const pr = parseFloat(precio) || 0;
+          const disponible = true;
+          const img =
+            'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
+          catalogo.push({ id, nombre: nm, precio: pr, categoria: cat, disponible, img });
+        }
+        localStorage.setItem('romeroCatalogo', JSON.stringify(catalogo));
+        alert('Carga desde Excel completada!');
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function guardar() {
+      const id = editando ? Number(document.getElementById('fId').value) : Date.now();
+      const nombre = document.getElementById('fNombre').value.trim();
+      const precio = Number(document.getElementById('fPrecio').value);
+      const categoria = document.getElementById('fCat').value;
+      const disponible = document.getElementById('fDisp').value === 'true';
+      let img = '';
+      const urlInput = document.getElementById('fUrl').value.trim();
+      const fileInput = document.getElementById('fFile').files[0];
+
+      if (!nombre || !precio) {
+        alert('Faltan datos (nombre y precio obligatorios)');
+        return;
+      }
+
+      if (urlInput) {
+        img = urlInput;
+        saveProduct(id, nombre, precio, categoria, disponible, img);
+      } else if (fileInput) {
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+          img = ev.target.result;
+          saveProduct(id, nombre, precio, categoria, disponible, img);
+        };
+        reader.readAsDataURL(fileInput);
+      } else {
+        img =
+          'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
+        saveProduct(id, nombre, precio, categoria, disponible, img);
+      }
+    }
+
+    function saveProduct(id, nombre, precio, categoria, disponible, img) {
+      if (!nombre || !precio) {
+        alert('Faltan datos (nombre y precio obligatorios)');
+        return;
+      }
+
+      if (editando) {
+        const idx = catalogo.findIndex(x => x.id === id);
+        if (idx === -1) return alert('No se encontró el producto a editar');
+        catalogo[idx] = { id, nombre, precio, categoria, disponible, img };
+      } else {
+        catalogo.push({ id, nombre, precio, categoria, disponible, img });
+      }
+      localStorage.setItem('romeroCatalogo', JSON.stringify(catalogo));
+      alert('Producto guardado correctamente!');
+      clearForm();
+    }
+
+    function clearForm() {
+      editando = false;
+      ['fId', 'fNombre', 'fPrecio', 'fUrl', 'fFile'].forEach(id =>
+        (document.getElementById(id).value = '')
+      );
+      document.getElementById('fImg').src = '';
+      document.getElementById('fCat').value = 'Ropa de Mujer';
+      document.getElementById('fDisp').value = 'true';
+    }
+  </script>
+</body>
+</html>

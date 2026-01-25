@@ -1,0 +1,582 @@
+!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Bazar El Romero  Ropa, Hogar, Plantas y más</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Librería para leer Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root{--verde:#3a6b4a;--crema:#f5f1e8;--tierra:#8c5e46;--hoja:#5a8a3a;--texto:#2e2e2e}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+    body{background:var(--crema);color:var(--texto);padding-bottom:4rem}
+    header{background:var(--verde);color:#fff;padding:1.5rem;text-align:center}
+    header h1{font-size:2rem;margin-bottom:.5rem}
+    header p{font-size:1.1rem;opacity:.9}
+    #filtros{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem;padding:1rem}
+    .btn-filtro{background:var(--hoja);border:none;padding:.6rem 1rem;border-radius:25px;color:#fff;font-weight:bold;cursor:pointer;transition:.3s}
+    .btn-filtro:hover{background:var(--tierra)}
+    .activo{background:var(--verde)}
+    #productos{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;padding:2rem}
+    .tarjeta{background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.15);overflow:hidden;display:flex;flex-direction:column}
+    .tarjeta img{width:100%;height:200px;object-fit:cover}
+    .info{padding:1rem;display:flex;flex-direction:column;flex-grow:1}
+    .info h3{margin-bottom:.5rem;color:var(--verde)}
+    .precio{font-size:1.3rem;font-weight:bold;color:var(--tierra);margin-top:auto}
+    .disponible{background:#10b981;color:#fff;padding:.2rem .6rem;border-radius:12px;font-size:.8rem;align-self:flex-start}
+    .agotado{background:#ef4444}
+    #carritoFlotante{position:fixed;bottom:1rem;right:1rem;background:var(--verde);color:#fff;padding:1rem 1.5rem;border-radius:50px;box-shadow:0 4px 12px rgba(0,0,0,.25);cursor:pointer;display:flex;align-items:center;gap:.5rem;font-weight:bold;z-index:998}
+    #modalFondo{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;display:none;align-items:center;justify-content:center}
+    #modal{background:var(--crema);border-radius:12px;width:90%;max-width:500px;padding:1.5rem;max-height:80vh;overflow-y:auto}
+    #modal h3{margin-bottom:1rem;color:var(--verde)}
+    #listaCarrito{margin-bottom:1rem}
+    .itemCarrito{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid var(--tierra)}
+    .total{font-size:1.4rem;font-weight:bold;color:var(--tierra);margin-top:1rem;text-align:right}
+    .botones{display:flex;gap:1rem;margin-top:1.5rem}
+    .botones button{flex:1;padding:.75rem;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+    .btn-wsp{background:#f3f7f5;color:#fff}
+    .btn-wsp:hover{background:#1ebe5d}
+    .btn-cancel{background:#ccc;color:#fff}
+    .btn-cancel:hover{background:#bbb}
+    #loginScreen,#adminScreen {position: fixed;inset: 0;background: #fff;overflow-y: auto; /* Añadir scroll vertical */
+     display: block; /* No usar flex para evitar centrar vertical */padding: 2rem;box-sizing: border-box;z-index: 1000;}
+    .box{width:90%;max-width:400px;background:var(--crema);border:2px solid var(--verde);border-radius:12px;padding:2rem;text-align:center}
+    .box input,.box button{width:100%;margin:.5rem 0;padding:.7rem;border-radius:8px;border:1px solid var(--tierra)}
+    .box button{background:var(--verde);color:#fff;font-weight:bold;cursor:pointer}
+    .box button:hover{background:var(--hoja)}
+    table{width:100%;border-collapse:collapse;margin-top:1rem}
+    th,td{padding:.5rem;border:1px solid var(--tierra)}
+    th{background:var(--verde);color:#fff}
+    img.mini{width:60px;height:60px;object-fit:cover;border-radius:4px}
+    .centrado{display:flex;justify-content:center;gap:1rem;margin-top:1rem;flex-wrap:wrap}
+    .small{font-size:.8rem;color:var(--tierra);margin-top:.3rem}
+    footer{text-align:center;padding:1.5rem;background:var(--tierra);color:#fff;margin-top:2rem}
+    button.inline{background:transparent;border:1px solid var(--hoja);padding:.3rem .6rem;border-radius:6px;cursor:pointer}
+  </style>
+</head>
+<script>
+  // Añade sombra al header y al menú cuando el usuario hace scroll
+  window.addEventListener("scroll", () => {
+    const header = document.getElementById("mainHeader");
+    const filtros = document.getElementById("filtros");
+    if (window.scrollY > 10) {
+      header.style.boxShadow = "0 4px 8px rgba(0,0,0,0.25)";
+      filtros.style.boxShadow = "0 4px 8px rgba(0,0,0,0.15)";
+    } else {
+      header.style.boxShadow = "none";
+      filtros.style.boxShadow = "none";
+    }
+  });
+</script>
+
+
+
+<body>
+<!-- HEADER FIJO -->
+<header style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-image: linear-gradient(to bottom, rgba(58, 107, 74, 0.9), rgba(10, 105, 42, 0.9));
+  background-size: cover;
+  background-position: center;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  color: white;
+  z-index: 1000;
+">
+  <img src="logofrank.jpg" alt="Logo Bazar El Romero"
+       style="width: 120px; height: auto; border-radius: 4px; margin-right: 1rem;">
+  <div>
+    <h1 style="margin: 0; font-size: 1.8em;">Bazar El Romero</h1>
+    <p style="margin: 0; font-size: 1em; opacity: 0.9;">Ropa, hogar, plantas y más · Villa Clara</p>
+  </div>
+</header>
+
+ <section style="text-align:center;padding:2rem;background:var(--crema)">
+    <img src="hola5.png" alt="Bazar El Romero" style="max-width:50%;border-radius:12px;">
+    <p style="margin-top:1rem;font-style:italic;color:var(--tierra)">
+      “Calidad y cariño en cada detalle.”
+    </p>
+  </section>
+
+
+<!-- MENÚ FIJO DE CATEGORÍAS -->
+<div id="filtros" style="
+  position: fixed;
+  top: 160px; /* justo debajo del header */
+  left: 0;
+  width: 100%;
+  background: var(--crema);
+  border-bottom: 1px solid var(--tierra);
+  z-index: 999;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+">
+  <button class="btn-filtro activo" onclick="filtrar('todos', event)">Todos</button>
+  <button class="btn-filtro" onclick="filtrar('Ropa de Mujer', event)">Ropa de Mujer</button>
+  <button class="btn-filtro" onclick="filtrar('Ropa de Hombre', event)">Ropa de Hombre</button>
+  <button class="btn-filtro" onclick="filtrar('Ropa de Niña', event)">Ropa de Niña</button>
+  <button class="btn-filtro" onclick="filtrar('Cerámica', event)">Cerámica</button>
+  <button class="btn-filtro" onclick="filtrar('Muñequería', event)">Muñequería</button>
+  <button class="btn-filtro" onclick="filtrar('Plásticos para el Hogar', event)">Plásticos</button>
+  <button class="btn-filtro" onclick="filtrar('Plantas Aromáticas y Medicinales', event)">Plantas</button>
+</div>
+<section id="productos"></section>
+
+  <div id="carritoFlotante" onclick="mostrarCarrito()">
+    <span id="carritoIcon">🛒</span>
+    <span id="carritoCant">0</span>
+  </div>
+
+  <div id="modalFondo" onclick="cerrarCarrito(event)">
+    <div id="modal" onclick="event.stopPropagation()">
+      <h3>Tu pedido</h3>
+      <div id="listaCarrito"></div>
+      <div class="total" id="totalCarrito">0.00 CUP</div>
+      <div class="botones">
+        <button class="btn-wsp" onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
+        <button class="btn-cancel" onclick="cerrarCarrito()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loginScreen" style="display:none">
+    <div class="box">
+      <h2>Acceso Administración</h2>
+      <input id="passInput" type="password" placeholder="Contraseña">
+      <button onclick="checkPass()">Entrar</button>
+      <button onclick="location.href='?'">Volver a la tienda</button>
+    </div>
+  </div>
+
+  <div id="adminScreen" style="display:none">
+    <div class="box" style="max-width:900px;width:96%">
+      <h2>Panel de Administración</h2>
+      <div class="centrado">
+        <button onclick="mostrarForm('add')">Añadir Producto</button>
+        <button onclick="mostrarCambioPass()">Cambiar Contraseña</button>
+        <button onclick="location.href='?'">Salir Admin</button>
+        <button onclick="exportarCatalogo('excel')">Exportar Catálogo a Excel</button>
+        <button onclick="exportarCatalogo('json')">Exportar Catálogo a JSON</button>
+
+      </div>
+
+      <!-- Carga Excel -->
+      <input type="file" id="excelFile" accept=".xlsx,.xls" style="margin-top:1rem">
+      <button onclick="cargarExcel()">Cargar productos desde Excel</button>
+
+      <!-- Form producto -->
+      <div id="formDiv" style="display:none;margin-top:1rem;text-align:left">
+        <input id="fId" type="hidden">
+        <input id="fNombre" placeholder="Nombre" style="width:48%">
+        <input id="fPrecio" type="number" placeholder="Precio CUP" style="width:48%;margin-left:4%">
+        <select id="fCat" style="width:48%;margin-top:.5rem">
+          <option value="Ropa de Mujer">Ropa de Mujer</option>
+          <option value="Ropa de Hombre">Ropa de Hombre</option>
+          <option value="Ropa de Niña">Ropa de Niña</option>
+          <option value="Cerámica">Cerámica</option>
+          <option value="Muñequería">Muñequería</option>
+          <option value="Plásticos para el Hogar">Plásticos para el Hogar</option>
+          <option value="Plantas Aromáticas y Medicinales">Plantas Aromáticas y Medicinales</option>
+        </select>
+        <select id="fDisp" style="width:48%;margin-left:4%;margin-top:.5rem">
+          <option value="true">Disponible</option>
+          <option value="false">Agotado</option>
+        </select>
+        <input id="fFile" type="file" accept="image/*" style="margin-top:.5rem">
+        <div class="small">⬆️ O bien sube un archivo desde tu PC</div>
+        <input id="fUrl" placeholder="https://tu-imagen.jpg" style="margin-top:.5rem">
+        <div class="small">⬆️ O pega aquí el link de tu imagen ya subida a internet</div>
+        <img id="fImg" class="mini" style="display:block;margin:.5rem 0">
+        <button onclick="guardar()">Guardar</button>
+        <button onclick="mostrarForm(null)">Cancelar</button>
+      </div>
+
+      <!-- Form cambio pass -->
+      <div id="passDiv" style="display:none;margin-top:1rem;text-align:left">
+        <input id="passActual" type="password" placeholder="Contraseña actual">
+        <input id="passNueva1" type="password" placeholder="Nueva contraseña">
+        <input id="passNueva2" type="password" placeholder="Repite nueva">
+        <button onclick="cambiarPass()">Actualizar contraseña</button>
+        <button onclick="mostrarCambioPass(null)">Cancelar</button>
+      </div>
+
+      <!-- Listado productos -->
+      <table>
+        <thead><tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Cat</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody id="listaProd"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Bazar El Romero – Villa Clara
+  </footer>
+
+  <script>
+    /* ----------  CONFIG / DATOS INICIALES  ---------- */
+    const PASS_DEFAULT = 'romero2025';
+    let PASS = localStorage.getItem('romeroPass') || PASS_DEFAULT;
+    let catalogo = JSON.parse(localStorage.getItem('romeroCatalogo') || 'null');
+
+    if (!catalogo || !catalogo.length) {
+      catalogo = [
+        {id:1,nombre:"Licra Larga",precio:4.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=60"},
+        {id:2,nombre:"Licra Corta",precio:3.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1508427953056-b00b8d78ebf5?auto=format&fit=crop&w=600&q=60"},
+        {id:3,nombre:"Vestidos Cortos",precio:100.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=60"},
+        {id:4,nombre:"Vestidos Largos",precio:5.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=60"},
+        {id:5,nombre:"Enguatada",precio:1.00,categoria:"Ropa de Hombre",disponible:true,img:"https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&w=600&q=60"},
+        {id:6,nombre:"Pulover",precio:5.00,categoria:"Ropa de Hombre",disponible:true,img:"https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&w=600&q=60"},
+        {id:7,nombre:"Juego de Blusa y Short",precio:10.00,categoria:"Ropa de Niña",disponible:true,img:"https://images.unsplash.com/photo-1558882224-dda166733046?auto=format&fit=crop&w=600&q=60"},
+        {id:8,nombre:"Tasa para Café",precio:10.00,categoria:"Cerámica",disponible:true,img:"https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?auto=format&fit=crop&w=600&q=60"},
+        {id:9,nombre:"Muñeca de Trapo Grande",precio:24.60,categoria:"Muñequería",disponible:true,img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=60"},
+        {id:10,nombre:"Jarra con Tapa",precio:28.20,categoria:"Plásticos para el Hogar",disponible:true,img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=60"},
+        {id:11,nombre:"Tilo",precio:31.80,categoria:"Plantas Aromáticas y Medicinales",disponible:true,img:"https://images.unsplash.com/photo-1592729645009-b96d1e63d14b?auto=format&fit=crop&w=600&q=60"}
+      ];
+      localStorage.setItem('romeroCatalogo', JSON.stringify(catalogo));
+    }
+
+    /* ----------  ADMIN  ---------- */
+    if (location.search.includes('admin')) document.getElementById('loginScreen').style.display = 'flex';
+
+    function checkPass(){
+      if(document.getElementById('passInput').value === PASS){
+        document.getElementById('loginScreen').style.display='none';
+        document.getElementById('adminScreen').style.display='flex';
+        mostrarTabla();
+      } else {
+        alert('Contraseña incorrecta');
+      }
+    }
+
+    function mostrarCambioPass(){
+      const div=document.getElementById('passDiv');
+      div.style.display = div.style.display === 'none' ? 'block' : 'none';
+      mostrarForm(null);
+    }
+
+    function cambiarPass(){
+      const actual=document.getElementById('passActual').value;
+      const nueva1=document.getElementById('passNueva1').value;
+      const nueva2=document.getElementById('passNueva2').value;
+      if(actual !== PASS){ alert('Contraseña actual incorrecta'); return; }
+      if(!nueva1 || nueva1 !== nueva2){ alert('Las nuevas contraseñas no coinciden o están vacías'); return; }
+      PASS = nueva1;
+      localStorage.setItem('romeroPass', PASS);
+      alert('Contraseña actualizada');
+      mostrarCambioPass(null);
+    }
+
+    let editando = false;
+
+    function mostrarForm(modo, id){
+      const form = document.getElementById('formDiv');
+      form.style.display = modo ? 'block' : 'none';
+      document.getElementById('passDiv').style.display = 'none'; // cerrar pass si abierto
+      if(!modo) return;
+      if(modo === 'add'){
+        editando = false;
+        ['fId','fNombre','fPrecio','fUrl'].forEach(i=>document.getElementById(i).value='');
+        document.getElementById('fCat').value = 'Ropa de Mujer';
+        document.getElementById('fDisp').value = 'true';
+        document.getElementById('fImg').src = '';
+        document.getElementById('fFile').value = '';
+      } else if (modo === 'edit'){
+        editando = true;
+        const p = catalogo.find(x => x.id === id);
+        if(!p) return alert('Producto no encontrado');
+        document.getElementById('fId').value = p.id;
+        document.getElementById('fNombre').value = p.nombre;
+        document.getElementById('fPrecio').value = p.precio;
+        document.getElementById('fCat').value = p.categoria;
+        document.getElementById('fDisp').value = p.disponible ? 'true' : 'false';
+        document.getElementById('fImg').src = p.img;
+        document.getElementById('fUrl').value = p.img;
+      }
+    }
+
+    // listeners único para inputs de imagen
+    document.getElementById('fFile').addEventListener('change', function(e){
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev){
+        document.getElementById('fImg').src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('fUrl').addEventListener('input', function(){
+      const url = this.value.trim();
+      if(url) document.getElementById('fImg').src = url;
+    });
+
+    function guardar(){
+      const id = editando ? Number(document.getElementById('fId').value) : Date.now();
+      const nombre = document.getElementById('fNombre').value.trim();
+      const precio = Number(document.getElementById('fPrecio').value);
+      const categoria = document.getElementById('fCat').value;
+      const disponible = document.getElementById('fDisp').value === 'true';
+      let img = '';
+      const urlInput = document.getElementById('fUrl').value.trim();
+      const fileInput = document.getElementById('fFile').files[0];
+
+      if(!nombre || !precio){ alert('Faltan datos (nombre y precio obligatorios)'); return; }
+
+      if(urlInput){
+        img = urlInput;
+        saveProduct(id, nombre, precio, categoria, disponible, img);
+      } else if (fileInput){
+        const reader = new FileReader();
+        reader.onload = function(ev){
+          img = ev.target.result;
+          saveProduct(id, nombre, precio, categoria, disponible, img);
+        };
+        reader.readAsDataURL(fileInput);
+        return;
+      } else {
+        img = 'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
+        saveProduct(id, nombre, precio, categoria, disponible, img);
+      }
+    }
+
+    function saveProduct(id, nombre, precio, categoria, disponible, img){
+      precio = Number(precio) || 0;
+      if(!nombre || !precio){ alert('Faltan datos (nombre y precio obligatorios)'); return; }
+
+      if(editando){
+        const idx = catalogo.findIndex(x=>x.id===id);
+        if(idx === -1) return alert('No se encontró el producto a editar');
+        catalogo[idx] = {id, nombre, precio, categoria, disponible, img};
+      } else {
+        catalogo.push({id, nombre, precio, categoria, disponible, img});
+      }
+      localStorage.setItem('romeroCatalogo', JSON.stringify(catalogo));
+      mostrarForm(null);
+      mostrarTabla();
+      renderizar();
+    }
+
+    function borrar(id){
+      if(!confirm('¿Borrar?')) return;
+      catalogo = catalogo.filter(x=>x.id!==id);
+      localStorage.setItem('romeroCatalogo', JSON.stringify(catalogo));
+      mostrarTabla();
+      renderizar();
+    }
+
+    function mostrarTabla(){
+      const tbody = document.getElementById('listaProd');
+      tbody.innerHTML = '';
+      catalogo.forEach(p=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><img class="mini" src="${p.img}"></td>
+          <td>${p.nombre}</td>
+          <td>${Number(p.precio).toFixed(2)} CUP</td>
+          <td>${p.categoria}</td>
+          <td>${p.disponible ? 'Disp' : 'Agot'}</td>
+          <td>
+            <button class="inline" onclick="mostrarForm('edit', ${p.id})">Editar</button>
+            <button class="inline" onclick="borrar(${p.id})">Borrar</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ----------  EXCEL  (crear productos automáticamente) ---------- */
+    function cargarExcel() {
+      const input = document.getElementById('excelFile');
+      if(!input.files.length) return alert('Seleccioná un archivo Excel');
+
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e){
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        if(rows.length < 2) return alert('El archivo debe tener al menos 1 producto (fila de encabezado + 1 fila)');
+         
+        // Vaciar el catálogo antes de cargar el nuevo Excel
+        catalogo = [];
+
+        // iterar filas (saltar encabezado)
+        let created = 0;
+        for(let i=1; i<rows.length; i++){
+          const [categoria, nombre, precio] = rows[i];
+          if(!nombre || !precio) continue;
+          const id = Date.now() + i;
+          const cat = (categoria && categoria.toString().trim()) ? categoria.toString().trim() : 'Ropa de Mujer';
+          const nm = nombre.toString().trim();
+          const pr = parseFloat(precio) || 0;
+          const disponible = true;
+          const img = 'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
+          catalogo.push({id, nombre: nm, precio: pr, categoria: cat, disponible, img});
+          created++;
+        }
+        if(created > 0){
+          localStorage.setItem('romeroCatalogo', JSON.stringify(catalogo));
+          mostrarTabla();
+          renderizar();
+        }
+        alert(`Carga completa. Productos creados: ${created}`);
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    /* ----------  CARRITO  ---------- */
+    let carrito = [];
+    const carritoCant = document.getElementById('carritoCant');
+    const carritoIcon = document.getElementById('carritoIcon');
+
+    function addCarrito(id){
+      const prod = catalogo.find(p=>p.id===id);
+      if(!prod){ alert('Producto no encontrado'); return; }
+      if(!prod.disponible){ alert('Producto agotado'); return; }
+      const linea = carrito.find(l=>l.id===id);
+      if(linea){
+        linea.cant++;
+      }else{
+        carrito.push({...prod, cant:1});
+      }
+      actualizarCarritoUI();
+      mostrarCarrito();
+    }
+
+    function actualizarCarritoUI(){
+      const total = carrito.reduce((t,l)=>t+l.cant,0);
+      carritoCant.textContent = total;
+      carritoIcon.textContent = '🛒';
+    }
+
+    function mostrarCarrito(){
+      const lista = document.getElementById('listaCarrito');
+      const totalEl = document.getElementById('totalCarrito');
+      lista.innerHTML = '';
+      if(carrito.length === 0){
+        lista.innerHTML = '<p style="color:#666">No hay productos en el carrito</p>';
+        totalEl.textContent = '0.00 CUP';
+      } else {
+        let suma = 0;
+        carrito.forEach(l=>{
+          const div = document.createElement('div');
+          div.className = 'itemCarrito';
+          div.innerHTML = `
+            <div>
+              <strong>${l.nombre}</strong><br>
+              <small>${l.cant} × ${Number(l.precio).toFixed(2)} CUP</small>
+            </div>
+            <div>
+              <button class="inline" onclick="modCant(${l.id}, -1)">−</button>
+              <span style="margin:0 .6rem">${l.cant}</span>
+              <button class="inline" onclick="modCant(${l.id}, 1)">+</button>
+            </div>
+          `;
+          lista.appendChild(div);
+          suma += l.cant * l.precio;
+        });
+        totalEl.textContent = suma.toFixed(2) + ' CUP';
+      }
+      document.getElementById('modalFondo').style.display='flex';
+    }
+
+    function modCant(id, cambio){
+      const linea = carrito.find(l=>l.id===id);
+      if(!linea) return;
+      linea.cant += cambio;
+      if(linea.cant <= 0) carrito = carrito.filter(l=>l.id!==id);
+      actualizarCarritoUI();
+      mostrarCarrito();
+    }
+
+    function cerrarCarrito(e){
+      if(!e || e.target.id === 'modalFondo') document.getElementById('modalFondo').style.display='none';
+    }
+
+    function enviarWhatsApp(){
+      if(carrito.length === 0){ alert('Carrito vacío'); return; }
+      const tlf = '5353941233'; /* número que pediste mantener */
+      let texto = 'Hola, quisiera hacer este pedido:%0A%0A';
+      let total = 0;
+      carrito.forEach(l=>{
+        texto += `• ${l.nombre} (${l.cant}×${Number(l.precio).toFixed(2)} CUP)%0A`;
+        total += l.cant * l.precio;
+      });
+      texto += `%0A*Total: ${total.toFixed(2)} CUP*%0A%0A¿Está disponible?`;
+      const url = `https://wa.me/${tlf}?text=${encodeURIComponent(decodeURIComponent(texto))}`;
+      window.open(url, '_blank');
+    }
+
+    /* ----------  RENDER TIENDA  ---------- */
+    const cont = document.getElementById('productos');
+    function renderizar(lista = catalogo){
+      cont.innerHTML = '';
+      lista.forEach(p=>{
+        const tarjeta = document.createElement('div');
+        tarjeta.className = 'tarjeta';
+        tarjeta.innerHTML = `
+          <img src="${p.img}" alt="${p.nombre}">
+          <div class="info">
+            <h3>${p.nombre}</h3>
+            <span class="${p.disponible ? 'disponible' : 'agotado'}">${p.disponible ? 'Disponible' : 'Agotado'}</span>
+            <div class="precio">${Number(p.precio).toFixed(2)} CUP</div>
+            <button onclick="addCarrito(${p.id})" style="margin-top:.5rem;padding:.4rem .8rem;border:none;border-radius:8px;background:var(--hoja);color:#fff;font-weight:bold;cursor:pointer">Agregar</button>
+          </div>
+        `;
+        cont.appendChild(tarjeta);
+      });
+    }
+
+    function filtrar(cat, ev){
+      document.querySelectorAll('.btn-filtro').forEach(b=>b.classList.remove('activo'));
+      if(ev && ev.target) ev.target.classList.add('activo');
+      renderizar(cat === 'todos' ? catalogo : catalogo.filter(x=>x.categoria === cat));
+    }
+
+    // render inicial
+    renderizar();
+
+    // si venimos a admin, mostrar login (otra verificación segura)
+    if (location.search.includes('admin')) {
+      document.getElementById('loginScreen').style.display = 'flex';
+    }
+    /* ---------- EXPORTAR CATÁLOGO ---------- */
+function exportarCatalogo(formato = 'excel') {
+  if (!catalogo || catalogo.length === 0) {
+    alert('No hay productos para exportar');
+    return;
+  }
+
+  if (formato === 'json') {
+    const blob = new Blob([JSON.stringify(catalogo, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'catalogo_bazar.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  } else {
+    // Exportar a Excel
+    const datos = [['Categoría', 'Nombre', 'Precio']];
+    catalogo.forEach(p => datos.push([p.categoria, p.nombre, p.precio]));
+    const hoja = XLSX.utils.aoa_to_sheet(datos);
+    const libro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(libro, hoja, 'Productos');
+    XLSX.writeFile(libro, 'catalogo_bazar.xlsx');
+  }
+
+  alert('Catálogo exportado correctamente');
+}
+
+  </script>
+</body>
+</html>

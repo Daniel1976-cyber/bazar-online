@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1764979646282,
+    "nombre": "Hierba Buena",
+    "precio": 150,
+    "categoria": "Plantas Aromáticas y Medicinales",
+    "disponible": true,
+    "img": "http://localhost:3000/images/1764979646256-q34xq9.jpeg",
+    "active": true
+  },
+  {
+    "id": 1764988985907,
+    "nombre": "Licra",
+    "precio": 300,
+    "categoria": "Ropa de Mujer",
+    "disponible": true,
+    "img": "http://localhost:3000/images/1764988985894-xixltm.jpg"
+  },
+  {
+    "id": 1764989024169,
+    "nombre": "Manzanilla",
+    "precio": 125,
+    "categoria": "Plantas Aromáticas y Medicinales",
+    "disponible": true,
+    "img": "http://localhost:3000/images/1764989024157-zmfdvo.jpeg"
+  },
+  {
+    "id": 1764989396510,
+    "nombre": "Tilo cubano",
+    "precio": 65,
+    "categoria": "Plantas Aromáticas y Medicinales",
+    "disponible": true,
+    "img": "http://localhost:3000/images/1764989396493-efdiuc.jpeg"
+  },
+  {
+    "id": 1765019841428,
+    "nombre": "Mejorana",
+    "precio": 10,
+    "categoria": "Plantas Aromáticas y Medicinales",
+    "disponible": true,
+    "img": "http://localhost:3000/images/1765019841378-gxisbd.jpeg"
+  },
+  {
+    "id": 1765047458191,
+    "nombre": "fggfgf",
+    "precio": 5,
+    "categoria": "Plomería PVC",
+    "disponible": true,
+    "img": "http://localhost:3000/images/1765047458176-u2tljt.webp"
+  }
+]
