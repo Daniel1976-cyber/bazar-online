@@ -238,7 +238,7 @@
     // Carga catálogo desde el servidor; si falla, intenta usar localStorage como fallback.
     async function loadCatalogFromServer() {
       try {
-        const res = await fetch('http://localhost:3000/products');
+        const res = await fetch('/products');
         if (!res.ok) throw new Error('No se pudo obtener catálogo desde servidor');
         catalogo = await res.json();
         console.log('Catálogo cargado desde servidor, elementos:', catalogo.length);
