@@ -127,6 +127,7 @@
   <button class="btn-filtro" onclick="filtrar('Muñequería', event)">Muñequería</button>
   <button class="btn-filtro" onclick="filtrar('Plásticos para el Hogar', event)">Plásticos</button>
   <button class="btn-filtro" onclick="filtrar('Plantas Aromáticas y Medicinales', event)">Plantas</button>
+  <button class="btn-filtro" onclick="filtrar('Plomería PVC', event)">Plomería PVC</button>
 </div>
 <section id="productos"></section>
 
@@ -185,6 +186,7 @@
           <option value="Muñequería">Muñequería</option>
           <option value="Plásticos para el Hogar">Plásticos para el Hogar</option>
           <option value="Plantas Aromáticas y Medicinales">Plantas Aromáticas y Medicinales</option>
+          <option value="Plomería PVC">Plomería PVC</option>
         </select>
         <select id="fDisp" style="width:48%;margin-left:4%;margin-top:.5rem">
           <option value="true">Disponible</option>
@@ -216,6 +218,11 @@
     </div>
   </div>
 
+  <!-- Contenedor para cargar la interfaz de administración avanzada (cargar produstos.html) -->
+  <div id="adminIframe" style="display:none;padding:1rem">
+    <!-- iframe se inyectará aquí cuando se detecte ?admin en la URL -->
+  </div>
+
   <footer>
     &copy; 2025 Bazar El Romero – Villa Clara
   </footer>
@@ -224,23 +231,22 @@
     /* ----------  CONFIG / DATOS INICIALES  ---------- */
     const PASS_DEFAULT = 'romero2025';
     let PASS = localStorage.getItem('romeroPass') || PASS_DEFAULT;
-    let catalogo = JSON.parse(localStorage.getItem('romeroCatalogo') || 'null');
+    // El catálogo ahora se carga desde el backend para que los cambios desde el panel
+    // de administración (server) se reflejen inmediatamente en la tienda.
+    let catalogo = [];
 
-    if (!catalogo || !catalogo.length) {
-      catalogo = [
-        {id:1,nombre:"Licra Larga",precio:4.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=60"},
-        {id:2,nombre:"Licra Corta",precio:3.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1508427953056-b00b8d78ebf5?auto=format&fit=crop&w=600&q=60"},
-        {id:3,nombre:"Vestidos Cortos",precio:100.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=60"},
-        {id:4,nombre:"Vestidos Largos",precio:5.00,categoria:"Ropa de Mujer",disponible:true,img:"https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=600&q=60"},
-        {id:5,nombre:"Enguatada",precio:1.00,categoria:"Ropa de Hombre",disponible:true,img:"https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&w=600&q=60"},
-        {id:6,nombre:"Pulover",precio:5.00,categoria:"Ropa de Hombre",disponible:true,img:"https://images.unsplash.com/photo-1520975954732-35dd22299614?auto=format&fit=crop&w=600&q=60"},
-        {id:7,nombre:"Juego de Blusa y Short",precio:10.00,categoria:"Ropa de Niña",disponible:true,img:"https://images.unsplash.com/photo-1558882224-dda166733046?auto=format&fit=crop&w=600&q=60"},
-        {id:8,nombre:"Tasa para Café",precio:10.00,categoria:"Cerámica",disponible:true,img:"https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?auto=format&fit=crop&w=600&q=60"},
-        {id:9,nombre:"Muñeca de Trapo Grande",precio:24.60,categoria:"Muñequería",disponible:true,img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=60"},
-        {id:10,nombre:"Jarra con Tapa",precio:28.20,categoria:"Plásticos para el Hogar",disponible:true,img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&q=60"},
-        {id:11,nombre:"Tilo",precio:31.80,categoria:"Plantas Aromáticas y Medicinales",disponible:true,img:"https://images.unsplash.com/photo-1592729645009-b96d1e63d14b?auto=format&fit=crop&w=600&q=60"}
-      ];
-      localStorage.setItem('romeroCatalogo', JSON.stringify(catalogo));
+    // Carga catálogo desde el servidor; si falla, intenta usar localStorage como fallback.
+    async function loadCatalogFromServer() {
+      try {
+        const res = await fetch('/products');
+        if (!res.ok) throw new Error('No se pudo obtener catálogo desde servidor');
+        catalogo = await res.json();
+        console.log('Catálogo cargado desde servidor, elementos:', catalogo.length);
+      } catch (e) {
+        console.warn('No se pudo conectar al servidor, usando fallback localStorage:', e.message);
+        const local = JSON.parse(localStorage.getItem('romeroCatalogo') || 'null');
+        if (local && local.length) catalogo = local;
+      }
     }
 
     /* ----------  ADMIN  ---------- */
@@ -542,12 +548,26 @@
       renderizar(cat === 'todos' ? catalogo : catalogo.filter(x=>x.categoria === cat));
     }
 
-    // render inicial
-    renderizar();
+    // render inicial: cargar catálogo desde servidor (fallback localStorage)
+    loadCatalogFromServer().then(() => renderizar());
 
-    // si venimos a admin, mostrar login (otra verificación segura)
+    // si venimos a admin, cargar la interfaz de administración.
+    // Si se desea la antigua (localStorage) se puede añadir '?admin=legacy'
     if (location.search.includes('admin')) {
-      document.getElementById('loginScreen').style.display = 'flex';
+      // Si se solicita explicitly legacy, mostramos el administrador local
+      if (location.search.includes('admin=legacy')) {
+        document.getElementById('loginScreen').style.display = 'flex';
+      } else {
+        // Cargar la interfaz que creamos (cargar produstos.html) dentro de un iframe
+        const iframeContainer = document.getElementById('adminIframe');
+        iframeContainer.style.display = 'block';
+        iframeContainer.innerHTML = `<iframe src="cargar produstos.html" style="width:100%;height:85vh;border:0;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.12)"></iframe>`;
+        // ocultar pantallas locales
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminScreen').style.display = 'none';
+        // scroll to admin area
+        setTimeout(()=> window.scrollTo({ top: 160, behavior: 'smooth' }), 200);
+      }
     }
     /* ---------- EXPORTAR CATÁLOGO ---------- */
 function exportarCatalogo(formato = 'excel') {
