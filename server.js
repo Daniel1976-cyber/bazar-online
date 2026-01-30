@@ -199,7 +199,7 @@ app.post('/auth/login', (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: 'username/password required' });
   const users = readUsers();
-  const user = users.find(u => u.username === username);
+  const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
   if (!user) return res.status(401).json({ error: 'Invalid credentials' });
   const ok = bcrypt.compareSync(password, user.password);
   if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
