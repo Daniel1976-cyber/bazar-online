@@ -229,8 +229,10 @@
 
   <script>
     /* ----------  CONFIG / DATOS INICIALES  ---------- */
+    // Reiniciar contraseña a valor predeterminado al cargar la página
+    localStorage.removeItem('romeroPass');
     const PASS_DEFAULT = 'romero2025';
-    let PASS = localStorage.getItem('romeroPass') || PASS_DEFAULT;
+    let PASS = PASS_DEFAULT;
     // El catálogo ahora se carga desde el backend para que los cambios desde el panel
     // de administración (server) se reflejen inmediatamente en la tienda.
     let catalogo = [];
