@@ -5,7 +5,7 @@
     "precio": 150,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
-    "img": "http://localhost:3000/images/1764979646256-q34xq9.jpeg",
+    "img": "/images/1764979646256-q34xq9.jpeg",
     "active": true
   },
   {
@@ -14,7 +14,7 @@
     "precio": 300,
     "categoria": "Ropa de Mujer",
     "disponible": true,
-    "img": "http://localhost:3000/images/1764988985894-xixltm.jpg"
+    "img": "/images/1764988985894-xixltm.jpg"
   },
   {
     "id": 1764989024169,
@@ -22,7 +22,7 @@
     "precio": 125,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
-    "img": "http://localhost:3000/images/1764989024157-zmfdvo.jpeg"
+    "img": "/images/1764989024157-zmfdvo.jpeg"
   },
   {
     "id": 1764989396510,
@@ -30,7 +30,7 @@
     "precio": 65,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
-    "img": "http://localhost:3000/images/1764989396493-efdiuc.jpeg"
+    "img": "/images/1764989396493-efdiuc.jpeg"
   },
   {
     "id": 1765019841428,
@@ -38,7 +38,7 @@
     "precio": 10,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
-    "img": "http://localhost:3000/images/1765019841378-gxisbd.jpeg"
+    "img": "/images/1765019841378-gxisbd.jpeg"
   },
   {
     "id": 1765047458191,
@@ -46,6 +46,6 @@
     "precio": 5,
     "categoria": "Plomería PVC",
     "disponible": true,
-    "img": "http://localhost:3000/images/1765047458176-u2tljt.webp"
+    "img": "/images/1765047458176-u2tljt.webp"
   }
 ]
