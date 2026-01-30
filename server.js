@@ -224,6 +224,11 @@ app.post('/auth/change-password', authenticate, (req, res) => {
   }
 });
 
+// Route to serve admin.html
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 // Route to serve index.html at root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
