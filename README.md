@@ -59,4 +59,4 @@ fetch('http://localhost:3000/products', {
 
 Si quieres, puedo:
 - Ejecutar `npm install` y arrancar el servidor aquí.
-- Modificar `cargar produstos.html` para que guarde/lea desde este backend en lugar de `localStorage`.
+- Modificar `admin.html` para que guarde/lea desde este backend en lugar de `localStorage`.
