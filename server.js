@@ -228,13 +228,27 @@ app.post('/auth/login', async (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: 'username/password required' });
 
-  const { data: user, error } = await supabase
-    .from('users')
-    .select('*')
-    .ilike('username', username.trim())
-    .single();
+  // Try Supabase first
+  let user = null;
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .ilike('username', username.trim())
+      .single();
+    if (data) {
+      user = data;
+    }
+  } catch (e) {
+    console.error('Supabase auth error:', e);
+  }
 
-  if (error || !user) return res.status(401).json({ error: 'Invalid credentials' });
+  // Fallback to local users file if Supabase fails or user not found
+  if (!user) {
+    const users = readUsers();
+    user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+  }
 
   const ok = bcrypt.compareSync(password, user.password);
   if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
