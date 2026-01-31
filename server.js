@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -5,8 +6,14 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
 // Enable CORS for all routes (important for Vercel)
 app.use(cors({
@@ -59,24 +66,27 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-function readData() {
-  try {
-    const raw = fs.readFileSync(DATA_FILE, 'utf8') || '[]';
-    const arr = JSON.parse(raw);
-    // Ensure existing items have an `active` flag (default true)
-    return arr.map(item => (Object.assign({ active: true }, item)));
-  } catch (e) {
-    console.error('Error leyendo datos:', e);
+async function readData() {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error leyendo Supabase:', error);
     return [];
   }
+  return data;
 }
 
-function writeData(data) {
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
-  } catch (e) {
-    console.error('Error guardando datos:', e);
-  }
+// writeData is no longer needed globally as we update row by row
+// But we keep it as a placeholder if needed for migration
+async function writeData(data) {
+  // Migration only: upsert many
+  const { error } = await supabase
+    .from('products')
+    .upsert(data, { onConflict: 'id' });
+  if (error) console.error('Error insertando en Supabase:', error);
 }
 
 // Authentication middleware
@@ -96,25 +106,32 @@ function authenticate(req, res, next) {
 }
 
 // List all products (public)
-app.get('/products', (req, res) => {
-  const data = readData();
-  // If query ?all=true is requested and a valid token is provided, return everything
+app.get('/products', async (req, res) => {
   const wantAll = req.query && String(req.query.all).toLowerCase() === 'true';
+  const query = supabase.from('products').select('*');
+
   if (wantAll && req.headers['authorization']) {
     const auth = req.headers['authorization'];
     const parts = auth.split(' ');
     if (parts.length === 2 && parts[0] === 'Bearer') {
       try {
         jwt.verify(parts[1], JWT_SECRET);
-        return res.json(data);
+        // Admin gets all
       } catch (e) {
-        // invalid token -> fallthrough to public view
+        // invalid token -> fallback to public
+        query.eq('active', true).eq('disponible', true);
       }
+    } else {
+      query.eq('active', true).eq('disponible', true);
     }
+  } else {
+    // Public view: only show active and available products
+    query.eq('active', true).eq('disponible', true);
   }
-  // Public view: only show active products (and optionally those marked disponible)
-  const publicList = data.filter(p => p.active !== false && (p.disponible !== false));
-  res.json(publicList);
+
+  const { data, error } = await query.order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
 });
 
 // Get one product (public)
@@ -127,12 +144,10 @@ app.get('/products/:id', (req, res) => {
 });
 
 // Create product (protected)
-app.post('/products', authenticate, (req, res) => {
+app.post('/products', authenticate, async (req, res) => {
   const payload = req.body || {};
-  const data = readData();
-  const id = payload.id || Date.now();
   const product = {
-    id,
+    id: payload.id || Date.now(),
     nombre: payload.nombre || '',
     precio: payload.precio || 0,
     categoria: payload.categoria || '',
@@ -140,44 +155,47 @@ app.post('/products', authenticate, (req, res) => {
     img: payload.img || '',
     active: payload.active !== false
   };
-  data.push(product);
-  writeData(data);
-  res.status(201).json(product);
+  const { data, error } = await supabase.from('products').insert([product]).select();
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json(data[0]);
 });
 
 // Update product (protected)
-app.put('/products/:id', authenticate, (req, res) => {
+app.put('/products/:id', authenticate, async (req, res) => {
   const id = Number(req.params.id);
   const payload = req.body || {};
-  const data = readData();
-  const idx = data.findIndex(x => x.id === id);
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
-  // Merge updates but keep id
-  const updated = Object.assign({}, data[idx], payload, { id });
-  // Ensure active remains boolean if provided
-  if (payload.hasOwnProperty('active')) updated.active = !!payload.active;
-  data[idx] = updated;
-  writeData(data);
-  res.json(updated);
+  const { data, error } = await supabase
+    .from('products')
+    .update(payload)
+    .eq('id', id)
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data || data.length === 0) return res.status(404).json({ error: 'Not found' });
+  res.json(data[0]);
 });
 
 // Delete product (protected)
-app.delete('/products/:id', authenticate, (req, res) => {
+app.delete('/products/:id', authenticate, async (req, res) => {
   const id = Number(req.params.id);
-  const data = readData();
-  const idx = data.findIndex(x => x.id === id);
-  if (idx === -1) return res.status(404).json({ error: 'Not found' });
-  // Soft-delete: mark as inactive
-  data[idx].active = false;
-  writeData(data);
-  res.json(data[idx]);
+  const { data, error } = await supabase
+    .from('products')
+    .update({ active: false })
+    .eq('id', id)
+    .select();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data[0]);
 });
 
 // Import (replace all) (protected)
-app.post('/import', authenticate, (req, res) => {
+app.post('/import', authenticate, async (req, res) => {
   const payload = req.body;
   if (!Array.isArray(payload)) return res.status(400).json({ error: 'Array expected' });
-  writeData(payload);
+
+  // For safety in import, we might want to delete all first, or just upsert
+  const { error } = await supabase.from('products').upsert(payload);
+  if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true, count: payload.length });
 });
 
@@ -206,33 +224,47 @@ function readUsers() {
   }
 }
 
-app.post('/auth/login', (req, res) => {
+app.post('/auth/login', async (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: 'username/password required' });
-  const users = readUsers();
-  const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
-  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('*')
+    .ilike('username', username.trim())
+    .single();
+
+  if (error || !user) return res.status(401).json({ error: 'Invalid credentials' });
+
   const ok = bcrypt.compareSync(password, user.password);
   if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
+
   const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '8h' });
   res.json({ token });
 });
 
 // Change password (protected)
-app.post('/auth/change-password', authenticate, (req, res) => {
+app.post('/auth/change-password', authenticate, async (req, res) => {
   const { oldPassword, newPassword } = req.body || {};
   if (!oldPassword || !newPassword) return res.status(400).json({ error: 'oldPassword and newPassword required' });
-  const users = readUsers();
-  const user = users.find(u => u.id === req.user.id);
-  if (!user) return res.status(404).json({ error: 'User not found' });
+
+  const { data: user, error } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', req.user.id)
+    .single();
+
+  if (error || !user) return res.status(404).json({ error: 'User not found' });
   if (!bcrypt.compareSync(oldPassword, user.password)) return res.status(401).json({ error: 'Old password incorrect' });
-  user.password = bcrypt.hashSync(newPassword, 8);
-  try {
-    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
-    res.json({ ok: true });
-  } catch (e) {
-    res.status(500).json({ error: 'Could not save password' });
-  }
+
+  const hashedPassword = bcrypt.hashSync(newPassword, 8);
+  const { error: updateError } = await supabase
+    .from('users')
+    .update({ password: hashedPassword })
+    .eq('id', req.user.id);
+
+  if (updateError) return res.status(500).json({ error: 'Could not save password' });
+  res.json({ ok: true });
 });
 
 // Route to serve admin.html
