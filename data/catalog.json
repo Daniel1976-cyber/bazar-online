@@ -67,5 +67,25 @@
     "img": "/images/1770636669864-v7lw1x.jpg",
     "active": true,
     "created_at": "2026-02-09T11:31:09.943Z"
+  },
+  {
+    "id": 1770638433249,
+    "nombre": "codo de media",
+    "precio": 200,
+    "categoria": "Plomería PVC",
+    "disponible": true,
+    "img": "/images/1770638433183-ubci03.webp",
+    "active": true,
+    "created_at": "2026-02-09T12:00:33.249Z"
+  },
+  {
+    "id": 1770639209490,
+    "nombre": "dhdfiufi",
+    "precio": 52,
+    "categoria": "Ropa de Mujer",
+    "disponible": true,
+    "img": "/images/1770639209420-ms0p0j.webp",
+    "active": true,
+    "created_at": "2026-02-09T12:13:29.490Z"
   }
 ]
