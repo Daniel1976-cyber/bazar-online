@@ -87,5 +87,15 @@
     "img": "/images/1770639209420-ms0p0j.webp",
     "active": true,
     "created_at": "2026-02-09T12:13:29.490Z"
+  },
+  {
+    "id": 1770650030103,
+    "nombre": "fhfjj",
+    "precio": 45,
+    "categoria": "Plomería PVC",
+    "disponible": true,
+    "img": "/images/1770650030087-r62vnb.webp",
+    "active": true,
+    "created_at": "2026-02-09T15:13:50.103Z"
   }
 ]
