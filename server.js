@@ -9,11 +9,28 @@ const multer = require('multer');
 
 const app = express();
 
-// Enable CORS for all routes (important for Vercel)
-app.use(cors({
-  origin: ['https://bazar-online-swart.vercel.app', 'http://localhost:3000'],
-  credentials: true
-}));
+// Enable CORS for all routes
+app.use((req, res, next) => {
+  const allowedOrigins = ['https://bazar-online-swart.vercel.app', 'http://localhost:3000'];
+  const origin = req.headers.origin;
+  
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
 
 app.use(express.json({ limit: '10mb' }));
 
