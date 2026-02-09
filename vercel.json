@@ -6,11 +6,19 @@
       "use": "@vercel/node"
     },
     {
-      "src": "*.html",
+      "src": "**/*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "*.{jpg,png,jpeg,webp,gif,svg}",
+      "src": "**/*.jpg",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.png",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "**/*.jpeg",
       "use": "@vercel/static"
     },
     {
@@ -19,6 +27,30 @@
     }
   ],
   "routes": [
+    {
+      "src": "/images/(.*)",
+      "dest": "/data/images/$1"
+    },
+    {
+      "src": "/logofrank.jpg",
+      "dest": "/logofrank.jpg"
+    },
+    {
+      "src": "/hola5.png",
+      "dest": "/hola5.png"
+    },
+    {
+      "src": "/(.*\\.html)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*\\.jpg)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*\\.png)",
+      "dest": "/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "/server.js"
