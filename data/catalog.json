@@ -47,5 +47,25 @@
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "/images/1765047458176-u2tljt.webp"
+  },
+  {
+    "id": 1770636644701,
+    "nombre": "erty",
+    "precio": 46,
+    "categoria": "Ropa de Mujer",
+    "disponible": true,
+    "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
+    "active": true,
+    "created_at": "2026-02-09T11:30:44.701Z"
+  },
+  {
+    "id": 1770636669943,
+    "nombre": "jfgjk",
+    "precio": 522,
+    "categoria": "Ropa de Mujer",
+    "disponible": true,
+    "img": "/images/1770636669864-v7lw1x.jpg",
+    "active": true,
+    "created_at": "2026-02-09T11:31:09.943Z"
   }
 ]

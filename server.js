@@ -6,14 +6,8 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
-const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
 
 // Enable CORS for all routes (important for Vercel)
 app.use(cors({
@@ -66,27 +60,20 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-async function readData() {
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error leyendo Supabase:', error);
+// Read from local JSON file
+function readData() {
+  try {
+    const raw = fs.readFileSync(DATA_FILE, 'utf8') || '[]';
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('Error leyendo archivo local:', e);
     return [];
   }
-  return data;
 }
 
-// writeData is no longer needed globally as we update row by row
-// But we keep it as a placeholder if needed for migration
-async function writeData(data) {
-  // Migration only: upsert many
-  const { error } = await supabase
-    .from('products')
-    .upsert(data, { onConflict: 'id' });
-  if (error) console.error('Error insertando en Supabase:', error);
+// Write to local JSON file
+function writeData(data) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
 }
 
 // Authentication middleware
@@ -106,31 +93,27 @@ function authenticate(req, res, next) {
 }
 
 // List all products (public)
-app.get('/products', async (req, res) => {
+app.get('/products', (req, res) => {
   const wantAll = req.query && String(req.query.all).toLowerCase() === 'true';
-  const query = supabase.from('products').select('*');
+  let data = readData();
 
-  if (wantAll && req.headers['authorization']) {
-    const auth = req.headers['authorization'];
-    const parts = auth.split(' ');
-    if (parts.length === 2 && parts[0] === 'Bearer') {
-      try {
-        jwt.verify(parts[1], JWT_SECRET);
-        // Admin gets all
-      } catch (e) {
-        // invalid token -> fallback to public
-        query.eq('active', true).eq('disponible', true);
-      }
-    } else {
-      query.eq('active', true).eq('disponible', true);
+  // Check if admin token is valid
+  const auth = req.headers['authorization'];
+  const parts = auth && auth.split(' ');
+  if (parts && parts.length === 2 && parts[0] === 'Bearer') {
+    try {
+      jwt.verify(parts[1], JWT_SECRET);
+      wantAll = true; // Admin gets all
+    } catch (e) {
+      // invalid token -> fallback to public
     }
-  } else {
-    // Public view: only show active and available products
-    query.eq('active', true).eq('disponible', true);
   }
 
-  const { data, error } = await query.order('created_at', { ascending: false });
-  if (error) return res.status(500).json({ error: error.message });
+  if (!wantAll) {
+    // Public view: only show active and available products
+    data = data.filter(x => x.active !== false && x.disponible === true);
+  }
+
   res.json(data);
 });
 
@@ -144,7 +127,7 @@ app.get('/products/:id', (req, res) => {
 });
 
 // Create product (protected)
-app.post('/products', authenticate, async (req, res) => {
+app.post('/products', authenticate, (req, res) => {
   const payload = req.body || {};
   const product = {
     id: payload.id || Date.now(),
@@ -153,50 +136,61 @@ app.post('/products', authenticate, async (req, res) => {
     categoria: payload.categoria || '',
     disponible: !!payload.disponible,
     img: payload.img || '',
-    active: payload.active !== false
+    active: payload.active !== false,
+    created_at: new Date().toISOString()
   };
-  const { data, error } = await supabase.from('products').insert([product]).select();
-  if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json(data[0]);
+  
+  const data = readData();
+  data.push(product);
+  writeData(data);
+  
+  res.status(201).json(product);
 });
 
 // Update product (protected)
-app.put('/products/:id', authenticate, async (req, res) => {
+app.put('/products/:id', authenticate, (req, res) => {
   const id = Number(req.params.id);
   const payload = req.body || {};
-  const { data, error } = await supabase
-    .from('products')
-    .update(payload)
-    .eq('id', id)
-    .select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  if (!data || data.length === 0) return res.status(404).json({ error: 'Not found' });
-  res.json(data[0]);
+  const data = readData();
+  const index = data.findIndex(x => x.id === id);
+  
+  if (index === -1) return res.status(404).json({ error: 'Not found' });
+  
+  // Update product
+  data[index] = { ...data[index], ...payload, id }; // Keep original id
+  writeData(data);
+  
+  res.json(data[index]);
 });
 
 // Delete product (protected)
-app.delete('/products/:id', authenticate, async (req, res) => {
+app.delete('/products/:id', authenticate, (req, res) => {
   const id = Number(req.params.id);
-  const { data, error } = await supabase
-    .from('products')
-    .update({ active: false })
-    .eq('id', id)
-    .select();
-
-  if (error) return res.status(500).json({ error: error.message });
-  res.json(data[0]);
+  const data = readData();
+  const index = data.findIndex(x => x.id === id);
+  
+  if (index === -1) return res.status(404).json({ error: 'Not found' });
+  
+  // Soft delete - set active to false
+  data[index].active = false;
+  writeData(data);
+  
+  res.json(data[index]);
 });
 
 // Import (replace all) (protected)
-app.post('/import', authenticate, async (req, res) => {
+app.post('/import', authenticate, (req, res) => {
   const payload = req.body;
   if (!Array.isArray(payload)) return res.status(400).json({ error: 'Array expected' });
-
-  // For safety in import, we might want to delete all first, or just upsert
-  const { error } = await supabase.from('products').upsert(payload);
-  if (error) return res.status(500).json({ error: error.message });
-  res.json({ ok: true, count: payload.length });
+  
+  // Add timestamps
+  const data = payload.map(p => ({
+    ...p,
+    created_at: p.created_at || new Date().toISOString()
+  }));
+  
+  writeData(data);
+  res.json({ ok: true, count: data.length });
 });
 
 // Upload image (protected)
@@ -224,31 +218,15 @@ function readUsers() {
   }
 }
 
-app.post('/auth/login', async (req, res) => {
+app.post('/auth/login', (req, res) => {
   const { username, password } = req.body || {};
   if (!username || !password) return res.status(400).json({ error: 'username/password required' });
 
-  // Try Supabase first
-  let user = null;
-  try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .ilike('username', username.trim())
-      .single();
-    if (data) {
-      user = data;
-    }
-  } catch (e) {
-    console.error('Supabase auth error:', e);
-  }
-
-  // Fallback to local users file if Supabase fails or user not found
-  if (!user) {
-    const users = readUsers();
-    user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
-  }
+  // Read from local users file
+  const users = readUsers();
+  const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
+  
+  if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
   const ok = bcrypt.compareSync(password, user.password);
   if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
@@ -258,26 +236,21 @@ app.post('/auth/login', async (req, res) => {
 });
 
 // Change password (protected)
-app.post('/auth/change-password', authenticate, async (req, res) => {
+app.post('/auth/change-password', authenticate, (req, res) => {
   const { oldPassword, newPassword } = req.body || {};
   if (!oldPassword || !newPassword) return res.status(400).json({ error: 'oldPassword and newPassword required' });
 
-  const { data: user, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', req.user.id)
-    .single();
-
-  if (error || !user) return res.status(404).json({ error: 'User not found' });
-  if (!bcrypt.compareSync(oldPassword, user.password)) return res.status(401).json({ error: 'Old password incorrect' });
+  const users = readUsers();
+  const index = users.findIndex(u => u.id === req.user.id);
+  
+  if (index === -1) return res.status(404).json({ error: 'User not found' });
+  
+  if (!bcrypt.compareSync(oldPassword, users[index].password)) return res.status(401).json({ error: 'Old password incorrect' });
 
   const hashedPassword = bcrypt.hashSync(newPassword, 8);
-  const { error: updateError } = await supabase
-    .from('users')
-    .update({ password: hashedPassword })
-    .eq('id', req.user.id);
+  users[index].password = hashedPassword;
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
 
-  if (updateError) return res.status(500).json({ error: 'Could not save password' });
   res.json({ ok: true });
 });
 
