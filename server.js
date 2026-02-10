@@ -17,7 +17,12 @@ const app = express();
 
 // Enable CORS for all routes
 app.use((req, res, next) => {
-  const allowedOrigins = ['https://bazar-online-swart.vercel.app', 'http://localhost:3000'];
+  const allowedOrigins = [
+    'https://bazar-online-swart.vercel.app',
+    'https://bazar-online-7bpe4uh2e-daniel1976-cybers-projects.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ];
   const origin = req.headers.origin;
   
   if (allowedOrigins.includes(origin)) {
