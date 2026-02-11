@@ -114,13 +114,33 @@ async function saveProductsToSupabase(products) {
 }
 
 async function getUsersFromSupabase() {
-  if (!supabase) return null;
-  const { data, error } = await supabase.from('users').select('*');
-  if (error) {
-    console.error('Error fetching users from Supabase:', error.message);
+  if (!supabase) {
+    console.log('[USERS] Supabase no configurado (faltan variables de entorno)');
     return null;
   }
-  return data;
+  
+  try {
+    console.log('[USERS] Intentando leer usuarios de Supabase...');
+    const { data, error } = await supabase.from('users').select('*');
+    
+    if (error) {
+      console.error('[USERS] Error de Supabase:', error.message);
+      return null;  // Return null to fallback to local
+    }
+    
+    console.log('[USERS] Usuarios de Supabase:', data?.length || 0);
+    
+    // If no users in Supabase or empty array, fallback to local
+    if (!data || data.length === 0) {
+      console.log('[USERS] Supabase vacío, usando fallback local');
+      return null;
+    }
+    
+    return data;
+  } catch (e) {
+    console.error('[USERS] Excepción leyendo Supabase:', e.message);
+    return null;
+  }
 }
 
 async function saveUsersToSupabase(users) {
