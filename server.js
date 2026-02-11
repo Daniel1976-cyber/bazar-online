@@ -17,16 +17,16 @@ const app = express();
 
 // Enable CORS for all routes
 app.use((req, res, next) => {
-  const allowedOrigins = [
-    'https://bazar-online-swart.vercel.app',
-    'https://bazar-online-7bpe4uh2e-daniel1976-cybers-projects.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:3001'
-  ];
   const origin = req.headers.origin;
   
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+  // Allow localhost for development
+  // Allow any Vercel deployment (both bazaelromero and bazar-online projects)
+  if (!origin || 
+      origin.startsWith('http://localhost') ||
+      origin.includes('.vercel.app')) {
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
   }
   
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
