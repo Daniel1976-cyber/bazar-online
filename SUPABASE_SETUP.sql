@@ -1,7 +1,7 @@
 -- ============================================
 -- SQL para crear las tablas en Supabase
 -- Ejecutar esto en el Editor SQL de Supabase
--- ============================================
+-- ====================================
 
 -- Crear tabla de usuarios
 CREATE TABLE IF NOT EXISTS users (
@@ -30,23 +30,25 @@ WHERE NOT EXISTS (
   SELECT 1 FROM users WHERE id = 1
 );
 
--- Habilitar Row Level Security (opcional, para mayor seguridad)
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE products ENABLE ROW LEVEL SECURITY;
-
--- Crear políticas para acceso público a productos (lectura)
-CREATE POLICY "Productos públicos son visibles" ON products
-  FOR SELECT USING (true);
-
--- Crear políticas para acceso autenticado (admin)
-CREATE POLICY "Admin puede insertar productos" ON products
-  FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Admin puede actualizar productos" ON products
-  FOR UPDATE USING (true);
-
-CREATE POLICY "Admin puede borrar productos" ON products
-  FOR DELETE USING (true);
+-- Crear políticas para acceso público a productos (solo si no existen)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'products' AND policyname = 'Productos públicos son visibles') THEN
+    CREATE POLICY "Productos públicos son visibles" ON products FOR SELECT USING (true);
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'products' AND policyname = 'Admin puede insertar productos') THEN
+    CREATE POLICY "Admin puede insertar productos" ON products FOR INSERT WITH CHECK (true);
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'products' AND policyname = 'Admin puede actualizar productos') THEN
+    CREATE POLICY "Admin puede actualizar productos" ON products FOR UPDATE USING (true);
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'products' AND policyname = 'Admin puede borrar productos') THEN
+    CREATE POLICY "Admin puede borrar productos" ON products FOR DELETE USING (true);
+  END IF;
+END $$;
 
 -- Verificar que las tablas se crearon correctamente
 SELECT table_name FROM information_schema.tables 
