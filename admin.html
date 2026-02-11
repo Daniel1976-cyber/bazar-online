@@ -392,15 +392,27 @@
       }
 
       try {
+        console.log('[LOGIN] Intentando autenticación...');
+        console.log('[LOGIN] URL:', API_BASE + '/auth/login');
+        
         const res = await fetch(API_BASE + '/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
 
-        if (!res.ok) throw new Error('Credenciales inválidas');
+        console.log('[LOGIN] Respuesta status:', res.status);
+        console.log('[LOGIN] Headers:', [...res.headers.entries()]);
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('[LOGIN] Error response:', errorText);
+          throw new Error('Credenciales inválidas: ' + errorText);
+        }
 
         const data = await res.json();
+        console.log('[LOGIN] Token recibido:', data.token ? '✓' : '✗');
+        
         const remember = !!document.getElementById('rememberMe') && document.getElementById('rememberMe').checked;
         setToken(data.token, remember);
         updateAuthUI();
@@ -408,7 +420,8 @@
         document.getElementById('password').value = '';
         await fetchProducts();
       } catch (e) {
-        alert('Error al autenticar: ' + e.message);
+        console.error('[LOGIN] Error completo:', e);
+        alert('Error al autenticar: ' + e.message + '\n\nRevisa la consola para más detalles.');
       }
     }
 

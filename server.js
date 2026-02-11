@@ -15,28 +15,32 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 
 const app = express();
 
-// Enable CORS for all routes
+// Enable CORS for all routes - Configuración mejorada para Vercel
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   
   // Allow localhost for development
-  // Allow any Vercel deployment (both bazaelromero and bazar-online projects)
-  if (!origin || 
-      origin.startsWith('http://localhost') ||
-      origin.includes('.vercel.app')) {
-    if (origin) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-    }
+  // Allow any Vercel deployment
+  const allowedOrigins = [
+    'http://localhost',
+    'http://localhost:3000',
+    'https://bazar-online-swart.vercel.app',
+    'https://bazaelromero.vercel.app'
+  ];
+  
+  if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
   
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
   
   // Handle preflight
   if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Max-Age', '86400');
     return res.sendStatus(200);
   }
   
@@ -181,10 +185,18 @@ async function writeData(data) {
 async function readUsers() {
   // Try Supabase first
   const supabaseUsers = await getUsersFromSupabase();
-  if (supabaseUsers !== null) return supabaseUsers;
+  
+  console.log('[USERS] Supabase response:', supabaseUsers);
+  
+  if (supabaseUsers !== null) {
+    console.log('[USERS] Usando usuarios de Supabase:', supabaseUsers.length);
+    return supabaseUsers;
+  }
   
   // Fallback to local file
-  return readUsersLocal();
+  const localUsers = readUsersLocal();
+  console.log('[USERS] Usando usuarios locales:', localUsers.length);
+  return localUsers;
 }
 
 async function writeUsers(users) {
@@ -357,17 +369,36 @@ app.post('/upload-image', authenticate, upload.single('image'), (req, res) => {
 app.post('/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body || {};
-    if (!username || !password) return res.status(400).json({ error: 'username/password required' });
+    
+    console.log('[AUTH] Intento de login para usuario:', username);
+    console.log('[AUTH] Origen de la petición:', req.headers.origin);
+    
+    if (!username || !password) {
+      console.log('[AUTH] Error: username/password requeridos');
+      return res.status(400).json({ error: 'username/password required' });
+    }
 
     const users = await readUsers();
+    console.log('[AUTH] Usuarios encontrados:', users.length);
+    
     const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
     
-    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (!user) {
+      console.log('[AUTH] Usuario no encontrado:', username);
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
     const ok = bcrypt.compareSync(password, user.password);
-    if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
+    console.log('[AUTH] Password verificado:', ok);
+    
+    if (!ok) {
+      console.log('[AUTH] Password incorrecto');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '8h' });
+    console.log('[AUTH] Login exitoso para:', username);
+    
     res.json({ token });
   } catch (e) {
     console.error('Login error:', e);
