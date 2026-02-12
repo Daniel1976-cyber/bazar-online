@@ -172,8 +172,8 @@ function readUsersLocal() {
   try {
     const USERS_FILE = path.join(DATA_DIR, 'users.json');
     if (!fs.existsSync(USERS_FILE)) {
-      const hashed = bcrypt.hashSync('admin123', 8);
-      fs.writeFileSync(USERS_FILE, JSON.stringify([{ id: 1, username: 'admin', password: hashed }], null, 2));
+      // Crear archivo con el usuario admin usando el hash de Supabase
+      fs.writeFileSync(USERS_FILE, JSON.stringify([{ id: 1, username: 'admin', password: '$2a$08$tjAvMZWfHMhTiPVdfkIImeCbxJJ1d1t1d9nncyZEdZREhE8GlKeKm' }], null, 2));
     }
     const raw = fs.readFileSync(USERS_FILE, 'utf8') || '[]';
     return JSON.parse(raw);
