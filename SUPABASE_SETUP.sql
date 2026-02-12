@@ -23,9 +23,9 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 -- Insertar usuario admin por defecto (si no existe)
--- Password: admin123 -> Hash: $2a$08$0Xr3hDeRLjLZHxVX39MR7ueLCeEZG59F0ESAbCkhlNF/tyt0iDTNi
+-- Hash: $2a$08$tjAvMZWfHMhTiPVdfkIImeCbxJJ1d1t1d9nncyZEdZREhE8GlKeKm
 INSERT INTO users (id, username, password)
-SELECT 1, 'admin', '$2a$08$0Xr3hDeRLjLZHxVX39MR7ueLCeEZG59F0ESAbCkhlNF/tyt0iDTNi'
+SELECT 1, 'admin', '$2a$08$tjAvMZWfHMhTiPVdfkIImeCbxJJ1d1t1d9nncyZEdZREhE8GlKeKm'
 WHERE NOT EXISTS (
   SELECT 1 FROM users WHERE id = 1
 );
