@@ -13,6 +13,15 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
+// Supabase Storage bucket name
+const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || 'product-images';
+
+// Multer memory storage (for uploading to Supabase)
+const uploadMemory = multer({ 
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
 const app = express();
 
 // Enable CORS for all routes - Configuración mejorada para Vercel
@@ -377,12 +386,40 @@ app.post('/import', authenticate, async (req, res) => {
   }
 });
 
-// Upload image (protected)
-app.post('/upload-image', authenticate, upload.single('image'), (req, res) => {
+// Upload image (protected) - Uses Supabase Storage
+app.post('/upload-image', authenticate, uploadMemory.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'File required' });
-  // return a URL that can be used in products
-  const url = `/images/${req.file.filename}`;
-  res.json({ url });
+
+  try {
+    // Generate unique filename
+    const ext = path.extname(req.file.originalname) || '.jpg';
+    const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
+    
+    console.log('[UPLOAD] Subiendo imagen a Supabase Storage:', filename);
+    
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(SUPABASE_BUCKET)
+      .upload(filename, req.file.buffer, {
+        contentType: req.file.mimetype,
+        cacheControl: '3600'
+      });
+    
+    if (error) {
+      console.error('[UPLOAD] Error subiendo a Supabase:', error);
+      return res.status(500).json({ error: 'Error subiendo imagen: ' + error.message });
+    }
+    
+    // Get public URL
+    const { data: urlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(filename);
+    
+    console.log('[UPLOAD] Imagen subida exitosamente:', urlData.publicUrl);
+    res.json({ url: urlData.publicUrl });
+    
+  } catch (e) {
+    console.error('[UPLOAD] Error:', e);
+    res.status(500).json({ error: 'Error subiendo imagen' });
+  }
 });
 
 // Auth routes
