@@ -1,8 +1,12 @@
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+// Cargar .env manualmente para asegurar que usamos los valores del archivo
+const envConfig = dotenv.parse(fs.readFileSync(path.join(__dirname, '.env')));
+const supabaseUrl = envConfig.SUPABASE_URL;
+const supabaseKey = envConfig.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function testSupabase() {
