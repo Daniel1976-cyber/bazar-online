@@ -613,7 +613,10 @@
         body: fd
       });
 
-      if (!res.ok) throw new Error('Error subiendo imagen');
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Error desconocido al subir imagen');
+      }
       const data = await res.json();
       return API_BASE + data.url;
     }
