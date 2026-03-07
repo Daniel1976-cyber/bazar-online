@@ -8,29 +8,34 @@ async function testSupabase() {
     console.log('Probando conexión a Supabase...');
     console.log('URL:', supabaseUrl);
 
-    // 1. Probar listado de tablas (para ver si la conexión base funciona)
-    const { data: products, error: pError } = await supabase.from('products').select('id').limit(1);
-    if (pError) {
-        console.error('Error al leer tabla products:', pError.message);
+    // 1. Probar listado de tablas
+    console.log('\n--- TABLAS ---');
+    // Intentamos consulta directa
+    const { data: schemaTables, error: sError } = await supabase.from('products').select('*').limit(1);
+    if (sError) {
+        console.error('Error al acceder a "products":', sError.message);
     } else {
-        console.log('Conexión a base de datos OK. Productos encontrados:', products.length);
+        console.log('¡Tabla "products" encontrada y accesible!');
     }
 
     // 2. Probar Storage
-    console.log('\nRevisando Storage...');
+    console.log('\n--- STORAGE ---');
     const { data: buckets, error: bError } = await supabase.storage.listBuckets();
 
     if (bError) {
         console.error('Error al listar buckets:', bError.message);
     } else {
-        console.log('Buckets encontrados:', buckets.map(b => b.name).join(', '));
+        console.log('Buckets totales encontrados:', buckets.length);
+        buckets.forEach(b => {
+            console.log(`- Nombre: "${b.name}", Público: ${b.public}`);
+        });
+
         const bucketName = process.env.SUPABASE_BUCKET || 'product-images';
         const exists = buckets.find(b => b.name === bucketName);
         if (exists) {
-            console.log(`El bucket "${bucketName}" existe.`);
-            console.log(`¿Es público?: ${exists.public}`);
+            console.log(`\nConfirmado: El bucket "${bucketName}" existe.`);
         } else {
-            console.log(`EL BUCKET "${bucketName}" NO EXISTE.`);
+            console.log(`\nADVERTENCIA: El bucket "${bucketName}" NO aparece en la lista.`);
         }
     }
 }
