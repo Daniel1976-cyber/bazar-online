@@ -407,18 +407,23 @@ app.post('/upload-image', authenticate, uploadMemory.single('image'), async (req
 
     if (error) {
       console.error('[UPLOAD] Error subiendo a Supabase:', error);
-      return res.status(500).json({ error: 'Error subiendo imagen: ' + error.message });
+      return res.status(500).json({ error: error.message || 'Error desconocido en Supabase Storage' });
     }
 
     // Get public URL
-    const { data: urlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(filename);
+    const { data: urlData, error: urlError } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(filename);
+
+    if (urlError) {
+      console.error('[UPLOAD] Error obteniendo URL pública:', urlError);
+      return res.status(500).json({ error: 'Error obteniendo URL: ' + urlError.message });
+    }
 
     console.log('[UPLOAD] Imagen subida exitosamente:', urlData.publicUrl);
     res.json({ url: urlData.publicUrl });
 
   } catch (e) {
-    console.error('[UPLOAD] Error:', e);
-    res.status(500).json({ error: 'Error subiendo imagen' });
+    console.error('[UPLOAD] Error general:', e);
+    res.status(500).json({ error: e.message || 'Error interno al procesar imagen' });
   }
 });
 
