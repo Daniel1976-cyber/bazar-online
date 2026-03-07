@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ override: true });
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -17,7 +17,7 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || 'product-images';
 
 // Multer memory storage (for uploading to Supabase)
-const uploadMemory = multer({ 
+const uploadMemory = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }
 });
@@ -27,7 +27,7 @@ const app = express();
 // Enable CORS for all routes - Configuración mejorada para Vercel
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  
+
   // Allow localhost for development
   // Allow any Vercel deployment
   const allowedOrigins = [
@@ -36,23 +36,23 @@ app.use((req, res, next) => {
     'https://bazar-online-swart.vercel.app',
     'https://bazaelromero.vercel.app'
   ];
-  
+
   if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
     res.setHeader('Access-Control-Allow-Origin', origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
   }
-  
+
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
-  
+
   // Handle preflight
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Max-Age', '86400');
     return res.sendStatus(200);
   }
-  
+
   next();
 });
 
@@ -127,24 +127,24 @@ async function getUsersFromSupabase() {
     console.log('[USERS] Supabase no configurado (faltan variables de entorno)');
     return null;
   }
-  
+
   try {
     console.log('[USERS] Intentando leer usuarios de Supabase...');
     const { data, error } = await supabase.from('users').select('*');
-    
+
     if (error) {
       console.error('[USERS] Error de Supabase:', error.message);
       return null;  // Return null to fallback to local
     }
-    
+
     console.log('[USERS] Usuarios de Supabase:', data?.length || 0);
-    
+
     // If no users in Supabase or empty array, fallback to local
     if (!data || data.length === 0) {
       console.log('[USERS] Supabase vacío, usando fallback local');
       return null;
     }
-    
+
     return data;
   } catch (e) {
     console.error('[USERS] Excepción leyendo Supabase:', e.message);
@@ -197,7 +197,7 @@ async function readData() {
   // Try Supabase first
   const supabaseData = await getProductsFromSupabase();
   if (supabaseData !== null) return supabaseData;
-  
+
   // Fallback to local file
   return readDataLocal();
 }
@@ -206,7 +206,7 @@ async function writeData(data) {
   // Try Supabase first
   const success = await saveProductsToSupabase(data);
   if (success) return;
-  
+
   // Fallback to local file
   writeDataLocal(data);
 }
@@ -214,14 +214,14 @@ async function writeData(data) {
 async function readUsers() {
   // Try Supabase first
   const supabaseUsers = await getUsersFromSupabase();
-  
+
   console.log('[USERS] Supabase response:', supabaseUsers);
-  
+
   if (supabaseUsers !== null) {
     console.log('[USERS] Usando usuarios de Supabase:', supabaseUsers.length);
     return supabaseUsers;
   }
-  
+
   // Fallback to local file
   const localUsers = readUsersLocal();
   console.log('[USERS] Usando usuarios locales:', localUsers.length);
@@ -232,7 +232,7 @@ async function writeUsers(users) {
   // Try Supabase first
   const success = await saveUsersToSupabase(users);
   if (success) return;
-  
+
   // Fallback to local file
   const USERS_FILE = path.join(DATA_DIR, 'users.json');
   fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf8');
@@ -313,11 +313,11 @@ app.post('/products', authenticate, async (req, res) => {
       active: payload.active !== false,
       created_at: new Date().toISOString()
     };
-    
+
     const data = await readData();
     data.unshift(product); // Add to beginning
     await writeData(data);
-    
+
     res.status(201).json(product);
   } catch (e) {
     console.error('Error creating product:', e);
@@ -332,13 +332,13 @@ app.put('/products/:id', authenticate, async (req, res) => {
     const payload = req.body || {};
     let data = await readData();
     const index = data.findIndex(x => x.id === id);
-    
+
     if (index === -1) return res.status(404).json({ error: 'Not found' });
-    
+
     // Update product
     data[index] = { ...data[index], ...payload, id };
     await writeData(data);
-    
+
     res.json(data[index]);
   } catch (e) {
     console.error('Error updating product:', e);
@@ -352,13 +352,13 @@ app.delete('/products/:id', authenticate, async (req, res) => {
     const id = Number(req.params.id);
     let data = await readData();
     const index = data.findIndex(x => x.id === id);
-    
+
     if (index === -1) return res.status(404).json({ error: 'Not found' });
-    
+
     // Soft delete - set active to false
     data[index].active = false;
     await writeData(data);
-    
+
     res.json(data[index]);
   } catch (e) {
     console.error('Error deleting product:', e);
@@ -371,13 +371,13 @@ app.post('/import', authenticate, async (req, res) => {
   try {
     const payload = req.body;
     if (!Array.isArray(payload)) return res.status(400).json({ error: 'Array expected' });
-    
+
     // Add timestamps
     const data = payload.map(p => ({
       ...p,
       created_at: p.created_at || new Date().toISOString()
     }));
-    
+
     await writeData(data);
     res.json({ ok: true, count: data.length });
   } catch (e) {
@@ -394,9 +394,9 @@ app.post('/upload-image', authenticate, uploadMemory.single('image'), async (req
     // Generate unique filename
     const ext = path.extname(req.file.originalname) || '.jpg';
     const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
-    
+
     console.log('[UPLOAD] Subiendo imagen a Supabase Storage:', filename);
-    
+
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from(SUPABASE_BUCKET)
@@ -404,18 +404,18 @@ app.post('/upload-image', authenticate, uploadMemory.single('image'), async (req
         contentType: req.file.mimetype,
         cacheControl: '3600'
       });
-    
+
     if (error) {
       console.error('[UPLOAD] Error subiendo a Supabase:', error);
       return res.status(500).json({ error: 'Error subiendo imagen: ' + error.message });
     }
-    
+
     // Get public URL
     const { data: urlData } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(filename);
-    
+
     console.log('[UPLOAD] Imagen subida exitosamente:', urlData.publicUrl);
     res.json({ url: urlData.publicUrl });
-    
+
   } catch (e) {
     console.error('[UPLOAD] Error:', e);
     res.status(500).json({ error: 'Error subiendo imagen' });
@@ -426,10 +426,10 @@ app.post('/upload-image', authenticate, uploadMemory.single('image'), async (req
 app.post('/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body || {};
-    
+
     console.log('[AUTH] Intento de login para usuario:', username);
     console.log('[AUTH] Origen de la petición:', req.headers.origin);
-    
+
     if (!username || !password) {
       console.log('[AUTH] Error: username/password requeridos');
       return res.status(400).json({ error: 'username/password required' });
@@ -437,9 +437,9 @@ app.post('/auth/login', async (req, res) => {
 
     const users = await readUsers();
     console.log('[AUTH] Usuarios encontrados:', users.length);
-    
+
     const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
-    
+
     if (!user) {
       console.log('[AUTH] Usuario no encontrado:', username);
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -447,7 +447,7 @@ app.post('/auth/login', async (req, res) => {
 
     const ok = bcrypt.compareSync(password, user.password);
     console.log('[AUTH] Password verificado:', ok);
-    
+
     if (!ok) {
       console.log('[AUTH] Password incorrecto');
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -455,7 +455,7 @@ app.post('/auth/login', async (req, res) => {
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '8h' });
     console.log('[AUTH] Login exitoso para:', username);
-    
+
     res.json({ token });
   } catch (e) {
     console.error('Login error:', e);
@@ -471,9 +471,9 @@ app.post('/auth/change-password', authenticate, async (req, res) => {
 
     let users = await readUsers();
     const index = users.findIndex(u => u.id === req.user.id);
-    
+
     if (index === -1) return res.status(404).json({ error: 'User not found' });
-    
+
     if (!bcrypt.compareSync(oldPassword, users[index].password)) return res.status(401).json({ error: 'Old password incorrect' });
 
     const hashedPassword = bcrypt.hashSync(newPassword, 8);
