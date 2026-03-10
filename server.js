@@ -291,7 +291,7 @@ app.get('/products', async (req, res) => {
     res.json(data);
   } catch (e) {
     console.error('Error in /products:', e);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', message: e.message });
   }
 });
 
@@ -304,7 +304,7 @@ app.get('/products/:id', async (req, res) => {
     if (!p) return res.status(404).json({ error: 'Not found' });
     res.json(p);
   } catch (e) {
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', message: e.message });
   }
 });
 
@@ -330,7 +330,7 @@ app.post('/products', authenticate, async (req, res) => {
     res.status(201).json(product);
   } catch (e) {
     console.error('Error creating product:', e);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', message: e.message });
   }
 });
 
