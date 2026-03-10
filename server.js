@@ -38,7 +38,7 @@ app.use((req, res, next) => {
   ];
 
   if (!origin || allowedOrigins.some(allowed => origin.startsWith(allowed))) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Access-Control-Allow-Origin', origin || allowedOrigins[0]);
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -73,7 +73,11 @@ app.use((req, res, next) => {
 app.use(express.static(__dirname));
 
 // JWT secret
-const JWT_SECRET = process.env.JWT_SECRET || 'cambiar_esto_por_una_secreta_en_prod';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  console.error('[SECURITY] FATAL: JWT_SECRET not set in production');
+  process.exit(1);
+}
 
 // Local storage fallback paths (for local development)
 const DATA_DIR = path.join(__dirname, 'data');
