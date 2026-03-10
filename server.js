@@ -10,8 +10,13 @@ const { createClient } = require('@supabase/supabase-js');
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+// Use Service Role Key if available (bypasses RLS), fallback to Anon Key
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.warn('[SECURITY] Warning: SUPABASE_SERVICE_ROLE_KEY not set. Using Anon Key (RLS policies will apply).');
+}
 
 // Supabase Storage bucket name
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || 'product-images';
@@ -120,7 +125,7 @@ async function saveProductsToSupabase(products) {
   if (!supabase) return false;
   const { error } = await supabase.from('products').upsert(products);
   if (error) {
-    console.error('Error saving to Supabase:', error.message);
+    console.error('Error saving to Supabase:', error.message, error.details, error.hint);
     return false;
   }
   return true;
