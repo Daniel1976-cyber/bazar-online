@@ -284,8 +284,8 @@ app.get('/products', async (req, res) => {
     }
 
     if (!wantAll) {
-      // Public view: only show active and available products
-      data = data.filter(x => x.active !== false && x.disponible === true);
+      // Public view: only hide if explicitly marked as inactive or unavailable
+      data = data.filter(x => x.active !== false && x.disponible !== false);
     }
 
     res.json(data);
