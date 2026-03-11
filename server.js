@@ -208,15 +208,8 @@ async function readData() {
   const supabaseData = await getProductsFromSupabase();
   if (supabaseData !== null) return supabaseData;
 
-  // Fallback to local file only in development (NOT in Vercel)
-  const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
-  if (!isVercel) {
-    return readDataLocal();
-  }
-
-  // In production (Vercel), if Supabase fails, we must return an empty set or throw
-  console.error('[DATABASE] Supabase failed in production. Returning empty list.');
-  return [];
+  // Fallback to local file
+  return readDataLocal();
 }
 
 async function writeData(data) {
@@ -224,15 +217,9 @@ async function writeData(data) {
   const success = await saveProductsToSupabase(data);
   if (success) return;
 
-  // Fallback to local file only in development (NOT in Vercel)
-  const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
-  if (!isVercel) {
-    writeDataLocal(data);
-    return;
-  }
-
-  // In production (Vercel), local write is impossible
-  throw new Error('No se pudo guardar en Supabase y el sistema de archivos local es de solo lectura en Vercel. Revisa la configuración de SUPABASE_SERVICE_ROLE_KEY.');
+  // Fallback to local file
+  writeDataLocal(data);
+}
 }
 
 async function readUsers() {
