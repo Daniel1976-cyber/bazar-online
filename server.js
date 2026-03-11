@@ -15,8 +15,9 @@ const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABAS
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-  console.warn('[SECURITY] Warning: SUPABASE_SERVICE_ROLE_KEY not set. Using Anon Key (RLS policies will apply).');
+  console.warn('[SECURITY] Warning: SUPABASE_SERVICE_ROLE_KEY not set. Using Anon Key.');
 }
+console.log('[DATABASE] Connecting to:', supabaseUrl ? supabaseUrl.split('//')[1] : 'NOT SET');
 
 // Supabase Storage bucket name
 const SUPABASE_BUCKET = process.env.SUPABASE_BUCKET || 'product-images';
@@ -115,7 +116,7 @@ async function getProductsFromSupabase() {
   if (!supabase) return null;
   const { data, error } = await supabase.from('products').select('*').order('id', { ascending: false });
   if (error) {
-    console.error('Error fetching from Supabase:', error.message);
+    console.error('Error fetching from Supabase:', error.message, '| Hint:', error.hint);
     return null;
   }
   return data;
@@ -207,8 +208,15 @@ async function readData() {
   const supabaseData = await getProductsFromSupabase();
   if (supabaseData !== null) return supabaseData;
 
-  // Fallback to local file
-  return readDataLocal();
+  // Fallback to local file only in development (NOT in Vercel)
+  const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+  if (!isVercel) {
+    return readDataLocal();
+  }
+
+  // In production (Vercel), if Supabase fails, we must return an empty set or throw
+  console.error('[DATABASE] Supabase failed in production. Returning empty list.');
+  return [];
 }
 
 async function writeData(data) {
@@ -216,8 +224,15 @@ async function writeData(data) {
   const success = await saveProductsToSupabase(data);
   if (success) return;
 
-  // Fallback to local file
-  writeDataLocal(data);
+  // Fallback to local file only in development (NOT in Vercel)
+  const isVercel = process.env.VERCEL || process.env.NODE_ENV === 'production';
+  if (!isVercel) {
+    writeDataLocal(data);
+    return;
+  }
+
+  // In production (Vercel), local write is impossible
+  throw new Error('No se pudo guardar en Supabase y el sistema de archivos local es de solo lectura en Vercel. Revisa la configuración de SUPABASE_SERVICE_ROLE_KEY.');
 }
 
 async function readUsers() {
