@@ -427,6 +427,21 @@
 
   <script>
     /* ----------  CONFIG / DATOS INICIALES  ---------- */
+    let catalogo = [];
+    const API_BASE = window.location.origin;
+
+    async function loadCatalogFromServer() {
+      try {
+        console.log('[CLIENT] Cargando productos desde:', API_BASE + '/products');
+        const res = await fetch(API_BASE + '/products');
+        if (!res.ok) throw new Error('No se pudo cargar el catálogo');
+        catalogo = await res.json();
+        console.log('[CLIENT] Catálogo cargado:', catalogo.length, 'productos');
+      } catch (e) {
+        console.error('[CLIENT] Error cargando catálogo:', e);
+        // Fallback or alert
+      }
+    }
 
     /* ----------  CARRITO  ---------- */
     let carrito = [];
