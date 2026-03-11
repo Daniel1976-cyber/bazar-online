@@ -234,8 +234,8 @@ async function readUsers() {
 
   // Fallback to local file
   const localUsers = readUsersLocal();
-  console.log('[USERS] Usando usuarios locales:', localUsers.length);
-  return localUsers;
+  console.log('[USERS] Usando usuarios locales:', (localUsers || []).length);
+  return localUsers || [];
 }
 
 async function writeUsers(users) {
@@ -469,7 +469,7 @@ app.post('/auth/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '8h' });
-    console.log('[AUTH] Login exitoso para:', username);
+    console.log('[AUTH] Login exitoso para:', username, '- Token generado (len):', token.length);
 
     res.json({ token });
   } catch (e) {
