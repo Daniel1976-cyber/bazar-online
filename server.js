@@ -220,7 +220,6 @@ async function writeData(data) {
   // Fallback to local file
   writeDataLocal(data);
 }
-}
 
 async function readUsers() {
   // Try Supabase first
