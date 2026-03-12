@@ -1,15 +1,5 @@
 [
   {
-    "id": 1773310440259,
-    "nombre": "ddffgg",
-    "precio": 334455,
-    "categoria": "Ropa de Mujer",
-    "disponible": true,
-    "img": "https://jhgbhxlxswduimlkuqms.supabase.co/storage/v1/object/public/product-images/1773310437944-ks6fzm.webp",
-    "active": true,
-    "created_at": "2026-03-12T10:14:00.259Z"
-  },
-  {
     "id": 1773286035878,
     "nombre": "ttttttttt",
     "descripcion": null,
@@ -17,7 +7,7 @@
     "categoria": "Ropa de Mujer",
     "stock": null,
     "img": "https://jhgbhxlxswduimlkuqms.supabase.co/storage/v1/object/public/product-images/1773286034612-br2pcs.jpeg",
-    "active": true,
+    "active": false,
     "created_at": "2026-03-12T03:27:15.878+00:00",
     "disponible": true
   },
