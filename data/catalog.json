@@ -1,13 +1,13 @@
 [
   {
-    "id": 1773278532965,
-    "nombre": "sdsdsd",
-    "precio": 1222222222222,
+    "id": 1773284516694,
+    "nombre": "ffffff",
+    "precio": 44444,
     "categoria": "Ropa de Mujer",
     "disponible": true,
-    "img": "https://jhgbhxlxswduimlkuqms.supabase.co/storage/v1/object/public/product-images/1773278532152-0k64yw.webp",
+    "img": "https://jhgbhxlxswduimlkuqms.supabase.co/storage/v1/object/public/product-images/1773284510065-osy73g.webp",
     "active": true,
-    "created_at": "2026-03-12T01:22:12.965Z"
+    "created_at": "2026-03-12T03:01:56.694Z"
   },
   {
     "id": 1773173161379,
