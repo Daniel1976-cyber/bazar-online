@@ -39,6 +39,8 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     'http://localhost',
     'http://localhost:3000',
+    'http://127.0.0.1',
+    'http://127.0.0.1:3000',
     'https://bazar-online-swart.vercel.app',
     'https://bazaelromero.vercel.app'
   ];
@@ -451,7 +453,11 @@ app.post('/auth/login', async (req, res) => {
     }
 
     const users = await readUsers();
-    console.log('[AUTH] Usuarios encontrados:', users.length);
+    console.log('[AUTH] Usuarios cargados en memoria:', (users || []).length);
+
+    if (!users || users.length === 0) {
+      console.error('[AUTH] CRÍTICO: La lista de usuarios está vacía. El login fallará.');
+    }
 
     const user = users.find(u => u.username.toLowerCase() === username.trim().toLowerCase());
 

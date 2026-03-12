@@ -378,8 +378,7 @@
     let catalogo = [];
     let editando = false;
     // Si se desea mantener sesión entre recargas, poner true.
-    // Por seguridad y para forzar el login manual, dejamos false por defecto.
-    const PERSIST_SESSION = false;
+    const PERSIST_SESSION = true;
 
     // ===== TOKEN HELPERS =====
     function getToken() {
@@ -458,7 +457,7 @@
         }
 
         console.log('[LOGIN] Token recibido OK. Guardando...');
-        const remember = !!document.getElementById('rememberMe') && document.getElementById('rememberMe').checked;
+        const remember = PERSIST_SESSION || (!!document.getElementById('rememberMe') && document.getElementById('rememberMe').checked);
         setToken(data.token, remember);
         updateAuthUI();
         document.getElementById('username').value = '';
@@ -690,7 +689,11 @@
 
         alert('✓ Producto guardado correctamente');
         mostrarForm(null);
-        await fetchProducts();
+        // Pequeño delay para asegurar que Supabase procesó el cambio
+        setTimeout(async () => {
+          await fetchProducts();
+          if (typeof renderizar === 'function') renderizar(); // Actualizar tienda si está integrada
+        }, 500);
       } catch (e) {
         alert('Error guardando: ' + e.message);
       }
