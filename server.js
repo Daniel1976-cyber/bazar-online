@@ -79,7 +79,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static files (HTML, CSS, JS) from root directory
+// Serve static files (exclude HTML from direct static access)
+app.use((req, res, next) => {
+  if (req.path.endsWith('.html') && req.path !== '/') {
+    return res.status(404).send('Not Found');
+  }
+  next();
+});
 app.use(express.static(__dirname));
 
 // JWT secret
