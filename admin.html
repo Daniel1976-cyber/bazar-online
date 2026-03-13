@@ -541,14 +541,20 @@
       }
     }
 
-    // ===== CARGAR PRODUCTOS =====
     async function fetchProducts() {
       try {
         const token = getToken();
         const url = token ? (API_BASE + '/products?all=true') : (API_BASE + '/products');
         const opts = token ? { headers: { 'Authorization': 'Bearer ' + token } } : {};
         const res = await fetch(url, opts);
+        
+        if (res.status === 401) {
+          setToken(null);
+          updateAuthUI();
+          throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+        }
         if (!res.ok) throw new Error('No se pudo obtener productos');
+        
         catalogo = await res.json();
         mostrarTabla();
         renderProducts();
@@ -917,16 +923,34 @@
     }
 
     // ===== INICIALIZACIÓN =====
-    updateAuthUI();
-    
-    // Si hay token, cargamos productos
-    if (getToken()) {
-      fetchProducts();
-    } else {
-      // Si no hay token, aseguramos que el panel esté oculto (redundante pero seguro)
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('authSection').style.display = 'block';
+    async function initAdmin() {
+      const token = getToken();
+      if (!token) {
+        updateAuthUI();
+        return;
+      }
+      
+      try {
+        // Verificar token real con el backend antes de mostrar la UI
+        const res = await fetch(API_BASE + '/auth/check', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (!res.ok) {
+          throw new Error('Token inválido o expirado');
+        }
+        
+        // El token es válido, mostramos UI y cargamos datos
+        updateAuthUI();
+        fetchProducts();
+      } catch (e) {
+        console.error('Sesión inválida:', e.message);
+        setToken(null);
+        updateAuthUI();
+      }
     }
+
+    initAdmin();
   </script>
 </body>
 
