@@ -28,6 +28,10 @@
   ],
   "routes": [
     {
+      "src": "/admin",
+      "dest": "/server.js"
+    },
+    {
       "src": "/images/(.*)",
       "dest": "/data/images/$1"
     },
@@ -40,16 +44,16 @@
       "dest": "/hola5.png"
     },
     {
-      "src": "/(.*\\.html)",
-      "dest": "/$1"
-    },
-    {
       "src": "/(.*\\.jpg)",
       "dest": "/$1"
     },
     {
       "src": "/(.*\\.png)",
       "dest": "/$1"
+    },
+    {
+      "src": "/(.*\\.html)",
+      "status": 404
     },
     {
       "src": "/(.*)",

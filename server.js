@@ -524,21 +524,28 @@ app.post('/auth/change-password', authenticate, async (req, res) => {
   }
 });
 
+// Logout route (server-side cookie clearing)
+app.post('/auth/logout', (req, res) => {
+  res.clearCookie('romeroToken');
+  res.json({ ok: true });
+});
+
 // Route to serve admin.html (protected)
 app.get('/admin', (req, res) => {
   const token = req.cookies.romeroToken;
+  
   if (!token) {
-    // If no token, we still serve admin.html but the frontend will show the login form
-    // The key is that the frontend will now also check the cookie if possible, 
-    // but better yet, we can pass a 'loggedIn' flag or just serve a different file.
-    // However, to keep it simple and compatible with current admin.html:
+    // Serve admin.html but it will show the login form because of no token
     return res.sendFile(path.join(__dirname, 'admin.html'));
   }
 
   try {
     jwt.verify(token, JWT_SECRET);
+    // Valid token found in cookie, serve the page
     return res.sendFile(path.join(__dirname, 'admin.html'));
   } catch (e) {
+    // Invalid token, clear it and serve page (will show login)
+    res.clearCookie('romeroToken');
     return res.sendFile(path.join(__dirname, 'admin.html'));
   }
 });

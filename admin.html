@@ -279,8 +279,6 @@
       </div>
 
       <button onclick="login()">Iniciar Sesión</button>
-      <div class="small" style="text-align: center; margin-top: 0.8rem;">Credenciales por defecto: <strong>admin /
-          admin123</strong></div>
     </div>
 
     <div id="logoutForm" style="display: none;">
@@ -469,12 +467,20 @@
       }
     }
 
-    function logout() {
-      if (confirm('¿Deseas cerrar la sesión?')) {
+    async function logout() {
+      if (!confirm('¿Deseas cerrar la sesión?')) return;
+      
+      try {
+        await fetch(API_BASE + '/auth/logout', { method: 'POST' });
         // clear both session and local tokens
         setToken(null);
         updateAuthUI();
         alert('Sesión cerrada');
+      } catch (e) {
+        console.error('Error logging out:', e);
+        // Fallback to client-side only if server fails
+        setToken(null);
+        updateAuthUI();
       }
     }
 
@@ -911,11 +917,16 @@
     }
 
     // ===== INICIALIZACIÓN =====
-    // Actualizar UI según si existe token o no.
-    // NO borrar token aquí: dejar que persista en sessionStorage hasta que el usuario logout explícitamente.
     updateAuthUI();
-    // Cargar productos automáticamente si hay token (sin importar PERSIST_SESSION).
-    if (getToken()) fetchProducts();
+    
+    // Si hay token, cargamos productos
+    if (getToken()) {
+      fetchProducts();
+    } else {
+      // Si no hay token, aseguramos que el panel esté oculto (redundante pero seguro)
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('authSection').style.display = 'block';
+    }
   </script>
 </body>
 
