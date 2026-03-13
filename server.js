@@ -6,6 +6,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const multer = require('multer');
+const cookieParser = require('cookie-parser');
 const { createClient } = require('@supabase/supabase-js');
 
 // Initialize Supabase client
@@ -65,6 +66,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: '10mb' }));
+app.use(cookieParser());
 
 // Middleware to disable caching for API routes
 app.use((req, res, next) => {
@@ -253,10 +255,16 @@ async function writeUsers(users) {
 // ============ AUTH MIDDLEWARE ============
 function authenticate(req, res, next) {
   const auth = req.headers['authorization'];
-  if (!auth) return res.status(401).json({ error: 'No token' });
-  const parts = auth.split(' ');
-  if (parts.length !== 2 || parts[0] !== 'Bearer') return res.status(401).json({ error: 'Invalid token' });
-  const token = parts[1];
+  let token = null;
+
+  if (auth && auth.startsWith('Bearer ')) {
+    token = auth.split(' ')[1];
+  } else if (req.cookies && req.cookies.romeroToken) {
+    token = req.cookies.romeroToken;
+  }
+
+  if (!token) return res.status(401).json({ error: 'No token' });
+
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     req.user = payload;
@@ -477,6 +485,14 @@ app.post('/auth/login', async (req, res) => {
     const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '8h' });
     console.log('[AUTH] Login exitoso para:', username, '- Token generado (len):', token.length);
 
+    // Set cookie for session persistence (8 hours)
+    res.cookie('romeroToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 8 * 60 * 60 * 1000 // 8 hours
+    });
+
     res.json({ token });
   } catch (e) {
     console.error('Login error:', e);
@@ -508,9 +524,23 @@ app.post('/auth/change-password', authenticate, async (req, res) => {
   }
 });
 
-// Route to serve admin.html
+// Route to serve admin.html (protected)
 app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin.html'));
+  const token = req.cookies.romeroToken;
+  if (!token) {
+    // If no token, we still serve admin.html but the frontend will show the login form
+    // The key is that the frontend will now also check the cookie if possible, 
+    // but better yet, we can pass a 'loggedIn' flag or just serve a different file.
+    // However, to keep it simple and compatible with current admin.html:
+    return res.sendFile(path.join(__dirname, 'admin.html'));
+  }
+
+  try {
+    jwt.verify(token, JWT_SECRET);
+    return res.sendFile(path.join(__dirname, 'admin.html'));
+  } catch (e) {
+    return res.sendFile(path.join(__dirname, 'admin.html'));
+  }
 });
 
 // Route to serve index.html at root
