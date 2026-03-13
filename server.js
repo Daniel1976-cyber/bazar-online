@@ -499,11 +499,16 @@ app.post('/auth/login', async (req, res) => {
       maxAge: 8 * 60 * 60 * 1000 // 8 hours
     });
 
-    res.json({ token });
+    res.json({ token, user: { id: user.id, username: user.username } });
   } catch (e) {
     console.error('Login error:', e);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// Check auth status
+app.get('/auth/check', authenticate, (req, res) => {
+  res.json({ ok: true, user: req.user });
 });
 
 // Change password (protected)
@@ -541,8 +546,7 @@ app.get('/admin', (req, res) => {
   const token = req.cookies.romeroToken;
   
   if (!token) {
-    // Serve admin.html but it will show the login form because of no token
-    return res.sendFile(path.join(__dirname, 'admin.html'));
+    return res.redirect('/?admin=login');
   }
 
   try {
@@ -550,9 +554,9 @@ app.get('/admin', (req, res) => {
     // Valid token found in cookie, serve the page
     return res.sendFile(path.join(__dirname, 'admin.html'));
   } catch (e) {
-    // Invalid token, clear it and serve page (will show login)
+    // Invalid token, clear it and redirect
     res.clearCookie('romeroToken');
-    return res.sendFile(path.join(__dirname, 'admin.html'));
+    return res.redirect('/?admin=login');
   }
 });
 
