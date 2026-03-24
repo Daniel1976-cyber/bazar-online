@@ -7,8 +7,7 @@ Pequeño backend para almacenar el catálogo de productos en un archivo JSON.
 - npm
 
 ## Instalar dependencias
-Abre PowerShell en la carpeta del proyecto:
-
+Abre PowerShell en la carpeta del proyecto
 ```powershell
 cd "c:\Users\Yunior\Desktop\bazaelromero"
 npm install
@@ -57,6 +56,4 @@ fetch('http://localhost:3000/products', {
 - El servidor usa `data/catalog.json` para persistir. Los datos permanecen en disco en la máquina donde se ejecuta.
 - Las imágenes en Base64 (si las envías) se guardan como string en `img` pero eso puede crecer mucho el archivo JSON. Para producción, considera usar almacenamiento de archivos (S3, Cloud Storage, etc.).
 
-Si quieres, puedo:
-- Ejecutar `npm install` y arrancar el servidor aquí.
-- Modificar `admin.html` para que guarde/lea desde este backend en lugar de `localStorage`.
+
