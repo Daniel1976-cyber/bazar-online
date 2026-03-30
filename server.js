@@ -544,23 +544,9 @@ app.post('/auth/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-// Route to serve admin.html (protected)
+// Route to serve admin.html
 app.get('/admin', (req, res) => {
-  const token = req.cookies.romeroToken;
-  
-  if (!token) {
-    return res.redirect('/?admin=login');
-  }
-
-  try {
-    jwt.verify(token, JWT_SECRET);
-    // Valid token found in cookie, serve the page
-    return res.sendFile(path.join(__dirname, 'admin.html'));
-  } catch (e) {
-    // Invalid token, clear it and redirect
-    res.clearCookie('romeroToken');
-    return res.redirect('/?admin=login');
-  }
+  res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
 // Route to serve index.html at root
