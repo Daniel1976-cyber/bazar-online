@@ -276,633 +276,633 @@
     "disponible": true
   },
   {
-    "id": 1774898884351,
+    "id": 1774902308600,
     "nombre": "Llave paso 1/2 Media Pulgada PVC",
     "precio": 610,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884352,
+    "id": 1774902308601,
     "nombre": "Codo de 90 ° 1/2 Media Pulgada PVC",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884353,
+    "id": 1774902308602,
     "nombre": "Media Pulgada PVCCodo de 45 ° 1/2",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884354,
+    "id": 1774902308603,
     "nombre": "Nudo 1/2 Media Pulgada PVC",
     "precio": 150,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884355,
+    "id": 1774902308604,
     "nombre": "Te Media Pulgada PVC",
     "precio": 290,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884356,
+    "id": 1774902308605,
     "nombre": "Universal Media Pulgada PVC",
     "precio": 350,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884357,
+    "id": 1774902308606,
     "nombre": "Niple Media Pulgada PVC",
     "precio": 150,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884358,
+    "id": 1774902308607,
     "nombre": "Tapón Interno Media Pulgada PVC",
     "precio": 80,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.192Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884359,
+    "id": 1774902308608,
     "nombre": "Tapón Externo Media Pulgada PVC",
     "precio": 80,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884360,
+    "id": 1774902308609,
     "nombre": "Llave paso 3/4",
     "precio": 720,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884361,
+    "id": 1774902308610,
     "nombre": "Codo de 90 ° 3/4",
     "precio": 280,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884362,
+    "id": 1774902308611,
     "nombre": "Codo de 45 ° 3/4",
     "precio": 270,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884363,
+    "id": 1774902308612,
     "nombre": "Nudo 3/4",
     "precio": 170,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884364,
+    "id": 1774902308613,
     "nombre": "Te 3/4",
     "precio": 310,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884365,
+    "id": 1774902308614,
     "nombre": "Universal 3/4",
     "precio": 450,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884366,
+    "id": 1774902308615,
     "nombre": "Niple 3/4",
     "precio": 160,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884367,
+    "id": 1774902308616,
     "nombre": "Tapón Interno 3/4",
     "precio": 90,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884368,
+    "id": 1774902308617,
     "nombre": "Tapón Externo 3/4",
     "precio": 90,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884369,
+    "id": 1774902308618,
     "nombre": "Llave paso 1 pulgada",
     "precio": 810,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884370,
+    "id": 1774902308619,
     "nombre": "Codo de 90 ° 1 pulgada",
     "precio": 260,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884371,
+    "id": 1774902308620,
     "nombre": "Codo de 45 ° 1 pulgada",
     "precio": 260,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884372,
+    "id": 1774902308621,
     "nombre": "Nudo 1 pulgada",
     "precio": 170,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884373,
+    "id": 1774902308622,
     "nombre": "Te 1 pulgada",
     "precio": 320,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884374,
+    "id": 1774902308623,
     "nombre": "Universal 1 pulgada",
     "precio": 450,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884375,
+    "id": 1774902308624,
     "nombre": "Niple  1 pulgada",
     "precio": 160,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884376,
+    "id": 1774902308625,
     "nombre": "Tapón Interno 1 pulgada",
     "precio": 90,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884377,
+    "id": 1774902308626,
     "nombre": "Tapón Externo 1 pulgada",
     "precio": 80,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884378,
+    "id": 1774902308627,
     "nombre": "Busing 1/2\" a 3/4\"",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884379,
+    "id": 1774902308628,
     "nombre": "Busing 1/2\" a 1\"",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884380,
+    "id": 1774902308629,
     "nombre": "Busing 3/4\" a 1\"",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884381,
+    "id": 1774902308630,
     "nombre": "Reducido1/2\" a 3/4\"",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884382,
+    "id": 1774902308631,
     "nombre": "Reducido 1/2\" a 1\"",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884383,
+    "id": 1774902308632,
     "nombre": "Reducido 3/4\" a 1\"",
     "precio": 210,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884384,
+    "id": 1774902308633,
     "nombre": "Teflón",
     "precio": 300,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884385,
+    "id": 1774902308634,
     "nombre": "Plastilina Epósica",
     "precio": 450,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884386,
+    "id": 1774902308635,
     "nombre": "Llaves para Bebedero",
     "precio": 180,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884387,
+    "id": 1774902308636,
     "nombre": "Presillas Gas",
     "precio": 110,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884388,
+    "id": 1774902308637,
     "nombre": "Manquera plástica (m)",
     "precio": 190,
     "categoria": "Plomería PVC",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884389,
+    "id": 1774902308638,
     "nombre": "Tilo",
     "precio": 55,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884390,
+    "id": 1774902308639,
     "nombre": "Tilo de Anís",
     "precio": 60,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884391,
+    "id": 1774902308640,
     "nombre": "Albahaca Verde",
     "precio": 110,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884392,
+    "id": 1774902308641,
     "nombre": "Albahaca Morada",
     "precio": 110,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884393,
+    "id": 1774902308642,
     "nombre": "Salvia",
     "precio": 60,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884394,
+    "id": 1774902308643,
     "nombre": "Sábila",
     "precio": 110,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884395,
+    "id": 1774902308644,
     "nombre": "Mejorana",
     "precio": 80,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884396,
+    "id": 1774902308646,
     "nombre": "Hierba Buena",
     "precio": 80,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884397,
+    "id": 1774902308647,
     "nombre": "Manzanilla",
     "precio": 55,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884398,
+    "id": 1774902308648,
     "nombre": "Ruda",
     "precio": 180,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884399,
+    "id": 1774902308649,
     "nombre": "Romero Chico",
     "precio": 110,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884400,
+    "id": 1774902308650,
     "nombre": "Romero Grande",
     "precio": 170,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884401,
+    "id": 1774902308651,
     "nombre": "Orégano",
     "precio": 55,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884402,
+    "id": 1774902308652,
     "nombre": "Oreganito",
     "precio": 55,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884403,
+    "id": 1774902308653,
     "nombre": "Clavel",
     "precio": 160,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884404,
+    "id": 1774902308654,
     "nombre": "Rosa del Desierto Chica",
     "precio": 250,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884405,
+    "id": 1774902308655,
     "nombre": "Rosa del Desierto Mediana",
     "precio": 450,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884406,
+    "id": 1774902308656,
     "nombre": "Rosa del Desierto Grande",
     "precio": 650,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884407,
+    "id": 1774902308657,
     "nombre": "Cactus Bola",
     "precio": 160,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884408,
+    "id": 1774902308658,
     "nombre": "Sedum",
     "precio": 160,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884409,
+    "id": 1774902308659,
     "nombre": "Suculenta Rosas",
     "precio": 160,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884410,
+    "id": 1774902308660,
     "nombre": "Lengua de Vaca",
     "precio": 140,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884411,
+    "id": 1774902308661,
     "nombre": "Calanchoe",
     "precio": 160,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884412,
+    "id": 1774902308662,
     "nombre": "Plantas para Colgar",
     "precio": 140,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   },
   {
-    "id": 1774898884413,
+    "id": 1774902308663,
     "nombre": "Árbol de Jade",
     "precio": 160,
     "categoria": "Plantas Aromáticas y Medicinales",
     "disponible": true,
     "img": "https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60",
     "active": true,
-    "created_at": "2026-03-30T19:28:06.193Z"
+    "created_at": "2026-03-30T20:25:11.104Z"
   }
 ]
