@@ -369,7 +369,7 @@
   <h3 id="productosTitle" style="margin-top: 2rem; display: none;">Productos Cargados</h3>
   <div id="productList" class="product-list"></div>
 
-  <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;" />
+  <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;" onchange="cargarExcel()" />
 
   <script>
     const API_BASE = '';
@@ -850,17 +850,25 @@
 
           const products = [];
           for (let i = 1; i < rows.length; i++) {
-            const [categoria, nombre, precio] = rows[i];
-            if (!nombre || !precio) continue;
+            const row = rows[i];
+            if (!row || row.length < 2) continue;
+
+            const categoria = row[0];
+            const nombre = row[1];
+            const precio = row[2];
+            const disponibleStr = row[3];
+
+            if (!nombre) continue;
 
             const id = Date.now() + i;
             const cat = categoria ? String(categoria).trim() : 'Ropa de Mujer';
             const nm = String(nombre).trim();
             const pr = parseFloat(precio) || 0;
-            const disponible = true;
+            // Si la columna Disponible dice 'No', poner false, de lo contrario true
+            const disponible = disponibleStr && String(disponibleStr).toLowerCase().includes('no') ? false : true;
             const img = 'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
 
-            products.push({ id, nombre: nm, precio: pr, categoria: cat, disponible, img });
+            products.push({ id, nombre: nm, precio: pr, categoria: cat, disponible, img, active: true });
           }
 
           if (products.length === 0) return alert('No se encontraron productos válidos en el archivo');

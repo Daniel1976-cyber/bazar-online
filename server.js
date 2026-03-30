@@ -398,13 +398,16 @@ app.post('/import', authenticate, async (req, res) => {
     const payload = req.body;
     if (!Array.isArray(payload)) return res.status(400).json({ error: 'Array expected' });
 
-    // Add timestamps
+    const existing = await readData();
     const data = payload.map(p => ({
       ...p,
       created_at: p.created_at || new Date().toISOString()
     }));
 
-    await writeData(data);
+    // Merge: we use upsert in Supabase (handled by writeData) 
+    // but for local we need the merged array
+    const merged = [...existing, ...data];
+    await writeData(merged);
     res.json({ ok: true, count: data.length });
   } catch (e) {
     console.error('Error importing:', e);
