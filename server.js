@@ -134,11 +134,31 @@ async function getProductsFromSupabase() {
 
 async function saveProductsToSupabase(products) {
   if (!supabase) return false;
-  const { error } = await supabase.from('products').upsert(products);
+  
+  // Sanitize products: Supabase rejects rows with columns that don't exist in the table.
+  const schemaColumns = ['id', 'nombre', 'precio', 'categoria', 'disponible', 'img', 'active', 'created_at'];
+
+  const sanitizedProducts = (Array.isArray(products) ? products : [products]).map(p => {
+    const clean = {};
+    schemaColumns.forEach(cat => {
+      if (p[cat] !== undefined) clean[cat] = p[cat];
+    });
+    // Ensure numeric and boolean types
+    if (clean.id) clean.id = Number(clean.id);
+    if (clean.precio) clean.precio = Number(clean.precio);
+    if (clean.disponible !== undefined) clean.disponible = !!clean.disponible;
+    if (clean.active !== undefined) clean.active = !!clean.active;
+    return clean;
+  });
+
+  console.log(`[DATABASE] Intentando guardar ${sanitizedProducts.length} productos en Supabase...`);
+  
+  const { error } = await supabase.from('products').upsert(sanitizedProducts);
   if (error) {
-    console.error('Error saving to Supabase:', error.message, error.details, error.hint);
+    console.error('[DATABASE] Error saving to Supabase:', error.message, error.details);
     return false;
   }
+  console.log('[DATABASE] Guardado en Supabase exitoso.');
   return true;
 }
 
@@ -225,9 +245,13 @@ async function readData() {
 async function writeData(data) {
   // Try Supabase first
   const success = await saveProductsToSupabase(data);
-  if (success) return;
+  if (success) {
+    console.log('[SYNC] Datos sincronizados con la nube (Supabase).');
+    return;
+  }
 
   // Fallback to local file
+  console.warn('[SYNC] Fallback: Guardando datos en archivo local (data/catalog.json).');
   writeDataLocal(data);
 }
 

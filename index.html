@@ -26,6 +26,7 @@
     body {
       background: var(--crema);
       color: var(--texto);
+      padding-top: 230px; /* Espacio para el header y filtros fijos */
       padding-bottom: 4rem
     }
 
@@ -92,7 +93,9 @@
     .tarjeta img {
       width: 100%;
       height: 200px;
-      object-fit: cover
+      object-fit: cover;
+      background-color: #e0e0e0; /* Color de fondo si no hay imagen */
+      display: block;
     }
 
     .info {
@@ -340,7 +343,7 @@
 
 <body>
   <!-- HEADER FIJO -->
-  <header style="
+  <header id="mainHeader" style="
   position: fixed;
   top: 0;
   left: 0;
@@ -540,8 +543,12 @@
       lista.forEach(p => {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'tarjeta';
+        
+        // Manejo de imagen predeterminada o vacía
+        const imgSrc = p.img ? p.img : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+        
         tarjeta.innerHTML = `
-          <img src="${p.img}" alt="${p.nombre}">
+          <img src="${imgSrc}" alt="${p.nombre}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=Imagen+No+Disponible';">
           <div class="info">
             <h3>${p.nombre}</h3>
             <span class="${p.disponible ? 'disponible' : 'agotado'}">${p.disponible ? 'Disponible' : 'Agotado'}</span>

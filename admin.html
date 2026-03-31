@@ -744,9 +744,9 @@
 
       catalogo.forEach(p => {
         const tr = document.createElement('tr');
-        const imgSrc = p.img && p.img.startsWith('/') ? (API_BASE + p.img) : p.img;
+        const imgSrc = p.img && p.img.startsWith('/') ? (API_BASE + p.img) : (p.img || '');
         tr.innerHTML = `
-          <td><img class="mini" src="${imgSrc}" onerror="this.src='https://via.placeholder.com/60'"></td>
+          <td><img class="mini" src="${imgSrc}" onerror="this.onerror=null; this.src='https://via.placeholder.com/60?text=S/I';"></td>
           <td><strong>${p.nombre}</strong></td>
           <td>${Number(p.precio).toFixed(2)} CUP</td>
           <td>${p.categoria}</td>
@@ -796,7 +796,7 @@
         const img = document.createElement('img');
         img.className = 'mini';
         img.src = imgSrc;
-        img.onerror = () => (img.src = 'https://via.placeholder.com/60');
+        img.onerror = () => { img.onerror = null; img.src = 'https://via.placeholder.com/60?text=S/I'; };
 
         const info = document.createElement('div');
         info.className = 'product-info';
