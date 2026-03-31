@@ -540,6 +540,10 @@
     const cont = document.getElementById('productos');
     function renderizar(lista = catalogo) {
       cont.innerHTML = '';
+      if (!lista || lista.length === 0) {
+        cont.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--tierra); font-size: 1.2rem;">No se encontraron productos en esta categoría.</div>';
+        return;
+      }
       lista.forEach(p => {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'tarjeta';
@@ -563,7 +567,15 @@
     function filtrar(cat, ev) {
       document.querySelectorAll('.btn-filtro').forEach(b => b.classList.remove('activo'));
       if (ev && ev.target) ev.target.classList.add('activo');
-      renderizar(cat === 'todos' ? catalogo : catalogo.filter(x => x.categoria === cat));
+      
+      if (cat === 'todos') {
+        renderizar(catalogo);
+      } else {
+        const filtrados = catalogo.filter(x => 
+          String(x.categoria || '').toLowerCase().trim() === String(cat).toLowerCase().trim()
+        );
+        renderizar(filtrados);
+      }
     }
 
     // render inicial: cargar catálogo desde servidor (fallback localStorage)
