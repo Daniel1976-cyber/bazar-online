@@ -136,29 +136,42 @@ async function saveProductsToSupabase(products) {
   if (!supabase) return false;
   
   // Sanitize products: Supabase rejects rows with columns that don't exist in the table.
-  const schemaColumns = ['id', 'nombre', 'precio', 'categoria', 'disponible', 'img', 'active', 'created_at'];
+  // We use the EXACT column names provided by the user.
+  const schemaColumns = ['id', 'nombre', 'descripcion', 'precio', 'categoria', 'stock', 'img', 'active', 'created_at', 'disponible'];
 
   const sanitizedProducts = (Array.isArray(products) ? products : [products]).map(p => {
     const clean = {};
-    schemaColumns.forEach(cat => {
-      if (p[cat] !== undefined) clean[cat] = p[cat];
+    schemaColumns.forEach(col => {
+      // Handle potential name variations in incoming data
+      let val = p[col];
+      
+      // Fallback for common mismatches:
+      if (val === undefined && col === 'created_at') val = p.fecha_creacion;
+      if (val === undefined && col === 'categoria') val = p.categori_nombre;
+
+      if (val !== undefined) clean[col] = val;
     });
-    // Ensure numeric and boolean types
-    if (clean.id) clean.id = Number(clean.id);
+    
+    // Ensure numeric and boolean types:
+    if (clean.id) clean.id = Number(clean.id); // BIGINT safe for JS Numbers up to 2^53
     if (clean.precio) clean.precio = Number(clean.precio);
+    if (clean.stock !== undefined) clean.stock = Number(clean.stock) || 0;
     if (clean.disponible !== undefined) clean.disponible = !!clean.disponible;
     if (clean.active !== undefined) clean.active = !!clean.active;
+    
+    // If name is empty, don't send
+    if (!clean.nombre) return null;
     return clean;
-  });
+  }).filter(Boolean);
 
-  console.log(`[DATABASE] Intentando guardar ${sanitizedProducts.length} productos en Supabase...`);
+  console.log(`[DATABASE] Sincronizando ${sanitizedProducts.length} productos con Supabase...`);
   
   const { error } = await supabase.from('products').upsert(sanitizedProducts);
   if (error) {
-    console.error('[DATABASE] Error saving to Supabase:', error.message, error.details);
+    console.error('[DATABASE] Error crítico en Supabase:', error.message, '| Detalles:', error.details);
     return false;
   }
-  console.log('[DATABASE] Guardado en Supabase exitoso.');
+  console.log('[DATABASE] 🎉 Sincronización exitosa.');
   return true;
 }
 
