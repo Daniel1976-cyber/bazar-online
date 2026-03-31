@@ -848,27 +848,53 @@
 
           if (rows.length < 2) return alert('El archivo debe tener encabezado + al menos 1 producto');
 
+          // --- MAREO INTELIGENTE DE COLUMNAS ---
+          const headers = rows[0].map(h => String(h).toLowerCase().trim());
+          
+          const findCol = (keywords) => headers.findIndex(h => keywords.some(k => h.includes(k)));
+          
+          const idxCat = findCol(['categor', 'cat']);
+          const idxNom = findCol(['nombre', 'artículo', 'producto', 'item']);
+          const idxPre = findCol(['precio', 'costo', 'valor', 'cup']);
+          const idxDis = findCol(['disponible', 'estado', 'existencia']);
+          const idxSto = findCol(['stock', 'cantidad', 'inventario']);
+          const idxDes = findCol(['descrip', 'detalle', 'info']);
+
+          if (idxNom === -1) return alert('No se encontró una columna de "Nombre" en el Excel. Por favor, asegúrate de que el encabezado tenga esa columna.');
+
           const products = [];
           for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
-            if (!row || row.length < 2) continue;
-
-            const categoria = row[0];
-            const nombre = row[1];
-            const precio = row[2];
-            const disponibleStr = row[3];
-
-            if (!nombre) continue;
+            if (!row || !row[idxNom]) continue;
 
             const id = Date.now() + i;
-            const cat = categoria ? String(categoria).trim() : 'Ropa de Mujer';
-            const nm = String(nombre).trim();
-            const pr = parseFloat(precio) || 0;
-            // Si la columna Disponible dice 'No', poner false, de lo contrario true
-            const disponible = disponibleStr && String(disponibleStr).toLowerCase().includes('no') ? false : true;
+            const nm = String(row[idxNom]).trim();
+            const pr = idxPre !== -1 ? parseFloat(row[idxPre]) || 0 : 0;
+            const cat = idxCat !== -1 && row[idxCat] ? String(row[idxCat]).trim() : 'General';
+            
+            // Lógica de disponibilidad (si dice 'No', es falso)
+            let disp = true;
+            if (idxDis !== -1 && row[idxDis]) {
+              const dStr = String(row[idxDis]).toLowerCase();
+              if (dStr === 'no' || dStr === '0' || dStr === 'agotado') disp = false;
+            }
+
+            const sto = idxSto !== -1 ? parseInt(row[idxSto]) || 0 : 1;
+            const des = idxDes !== -1 ? String(row[idxDes] || '').trim() : '';
             const img = 'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
 
-            products.push({ id, nombre: nm, precio: pr, categoria: cat, disponible, img, active: true });
+            products.push({ 
+              id, 
+              nombre: nm, 
+              precio: pr, 
+              categoria: cat, 
+              disponible: disp, 
+              img, 
+              active: true,
+              stock: sto,
+              descripcion: des,
+              created_at: new Date().toISOString()
+            });
           }
 
           if (products.length === 0) return alert('No se encontraron productos válidos en el archivo');
