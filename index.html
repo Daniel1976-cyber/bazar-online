@@ -544,6 +544,10 @@
         cont.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--tierra); font-size: 1.2rem;">No se encontraron productos en esta categoría.</div>';
         return;
       }
+
+      // Ordenar alfabéticamente por nombre antes de renderizar
+      lista.sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || '')));
+
       lista.forEach(p => {
         const tarjeta = document.createElement('div');
         tarjeta.className = 'tarjeta';
