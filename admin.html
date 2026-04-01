@@ -612,6 +612,10 @@
     document.getElementById('fFile').addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (!file) return;
+      
+      // Si seleccionamos un archivo, limpiamos el campo de URL para dar prioridad al archivo
+      document.getElementById('fUrl').value = '';
+      
       const reader = new FileReader();
       reader.onload = function (ev) {
         document.getElementById('fImg').src = ev.target.result;
@@ -642,11 +646,14 @@
       const fileInput = document.getElementById('fFile').files[0];
 
       try {
-        if (urlInput) {
-          img = urlInput;
-        } else if (fileInput) {
+        if (fileInput) {
+          // Prioridad 1: Archivo seleccionado
           img = await uploadImage(fileInput);
+        } else if (urlInput) {
+          // Prioridad 2: URL de texto manual
+          img = urlInput;
         } else {
+          // Fallback final
           img = 'https://images.unsplash.com/photo-1520732483780-842b8ec93380?auto=format&fit=crop&w=600&q=60';
         }
 
@@ -674,7 +681,8 @@
         throw new Error(errorData.error || 'Error desconocido al subir imagen');
       }
       const data = await res.json();
-      return API_BASE + data.url;
+      // Ya no concatenamos API_BASE porque el servidor nos devuelve la URL pública completa
+      return data.url;
     }
 
     async function saveProduct(id, nombre, precio, categoria, disponible, img) {
