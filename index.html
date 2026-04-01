@@ -322,6 +322,29 @@
       border-radius: 6px;
       cursor: pointer
     }
+
+    /* Títulos de Categoría en el catálogo */
+    .cat-titulo {
+      grid-column: 1 / -1;
+      background: var(--verde);
+      color: #fff;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cat-titulo::before {
+      content: '✔';
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 <script>
@@ -545,26 +568,47 @@
         return;
       }
 
-      // Ordenar alfabéticamente por nombre antes de renderizar
-      lista.sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || '')));
-
+      // 1. Agrupar productos por categoría
+      const grupos = {};
       lista.forEach(p => {
-        const tarjeta = document.createElement('div');
-        tarjeta.className = 'tarjeta';
-        
-        // Manejo de imagen predeterminada o vacía
-        const imgSrc = p.img ? p.img : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
-        
-        tarjeta.innerHTML = `
-          <img src="${imgSrc}" alt="${p.nombre}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=Imagen+No+Disponible';">
-          <div class="info">
-            <h3>${p.nombre}</h3>
-            <span class="${p.disponible ? 'disponible' : 'agotado'}">${p.disponible ? 'Disponible' : 'Agotado'}</span>
-            <div class="precio">${Number(p.precio).toFixed(2)} CUP</div>
-            <button onclick="addCarrito(${p.id})" style="margin-top:.5rem;padding:.4rem .8rem;border:none;border-radius:8px;background:var(--hoja);color:#fff;font-weight:bold;cursor:pointer">Agregar</button>
-          </div>
-        `;
-        cont.appendChild(tarjeta);
+        const cat = p.categoria || 'Sin Categoría';
+        if (!grupos[cat]) grupos[cat] = [];
+        grupos[cat].push(p);
+      });
+
+      // 2. Ordenar las categorías (nombres de los grupos) alfabéticamente
+      const categoriasOrdenadas = Object.keys(grupos).sort((a, b) => a.localeCompare(b));
+
+      // 3. Renderizar cada grupo
+      categoriasOrdenadas.forEach(nombreCat => {
+        // Título de la categoría
+        const titulo = document.createElement('h2');
+        titulo.className = 'cat-titulo';
+        titulo.textContent = nombreCat;
+        cont.appendChild(titulo);
+
+        // Productos dentro de esta categoría ordenados por nombre
+        const productosCat = grupos[nombreCat].sort((a, b) => 
+          String(a.nombre || '').localeCompare(String(b.nombre || ''))
+        );
+
+        productosCat.forEach(p => {
+          const tarjeta = document.createElement('div');
+          tarjeta.className = 'tarjeta';
+          
+          const imgSrc = p.img ? p.img : 'https://via.placeholder.com/400x300?text=Sin+Imagen';
+          
+          tarjeta.innerHTML = `
+            <img src="${imgSrc}" alt="${p.nombre}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=Imagen+No+Disponible';">
+            <div class="info">
+              <h3>${p.nombre}</h3>
+              <span class="${p.disponible ? 'disponible' : 'agotado'}">${p.disponible ? 'Disponible' : 'Agotado'}</span>
+              <div class="precio">${Number(p.precio).toFixed(2)} CUP</div>
+              <button onclick="addCarrito(${p.id})" style="margin-top:.5rem;padding:.4rem .8rem;border:none;border-radius:8px;background:var(--hoja);color:#fff;font-weight:bold;cursor:pointer">Agregar</button>
+            </div>
+          `;
+          cont.appendChild(tarjeta);
+        });
       });
     }
 
